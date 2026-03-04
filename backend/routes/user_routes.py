@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import Session, select
 from db.session import get_session
-from models.users import UserCreate, User, UserRead, UserLogin
+from models.users import UserCreate, User, UserRead
 from models.tokens import TokenBase
 from utils import hash_password, verify_password
 from oauth2 import create_access_token
