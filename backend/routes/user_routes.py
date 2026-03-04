@@ -1,18 +1,21 @@
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import Session, select
+from dependancies.dependancies import get_current_user, allow_admin
 from db.session import get_session
 from models.users import UserCreate, User, UserRead
-from models.tokens import TokenBase
+from models.tokens import TokenData, TokenBase
 from utils import hash_password, verify_password
 from oauth2 import create_access_token
 from utils import DUMMY_HASH
 
 router : APIRouter = APIRouter( prefix="/users", tags=["users"])
 
-@router.get("/")
-def get_users():
-    return {"message": "Get all users"}
+@router.get("/", response_model=list[User] )
+def get_users(session: Session = Depends(get_session),  cur_user : TokenData = Depends(allow_admin) ):
+    """Get all users"""
+    users = session.exec(select(User)).all()
+    return users
 
 @router.post("/", response_model=UserRead, status_code=201)
 def register(user : UserCreate, session: Session = Depends(get_session)):
