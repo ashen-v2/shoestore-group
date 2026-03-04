@@ -8,8 +8,8 @@ from routes import user_routes
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     try:
-        engine.connect()
-        print("Connection to PostgreSQL database successful!")
+        with engine.connect() as conn:
+            print("Connection to PostgreSQL database successful!")
     except Exception as e:
         print(f"Error connecting to PostgreSQL database: {e}")
 
