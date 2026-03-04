@@ -17,4 +17,8 @@ class User(UserCreate, table=True):
     role: int = Field(default=1,nullable=False)
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc), nullable=False)
 
+class UserLogin(SQLModel):
+    email: EmailStr = Field(max_length=100 , nullable=False)
+    password: str = Field(max_length=100, nullable=False)
+
 
