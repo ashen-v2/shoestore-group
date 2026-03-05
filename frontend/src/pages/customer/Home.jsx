@@ -70,8 +70,8 @@ const Home = () => {
             <Navbar onSearch={setSearch} />
 
             {/* Top Banner */}
-            <div className="max-w-[1400px] mx-auto px-6 mt-6">
-                <div className="w-full h-[300px] rounded-[24px] overflow-hidden relative bg-gray-100 shadow-sm border border-gray-100">
+            <div className="max-w-350 mx-auto px-6 mt-6">
+                <div className="w-full h-75 rounded-3xl overflow-hidden relative bg-gray-100 shadow-sm border border-gray-100">
                     <img
                         src="/src/assets/images/nike_banner.jpg"
                         alt="Just Do It"
@@ -84,7 +84,7 @@ const Home = () => {
             </div>
 
             {/* Product Grid Section */}
-            <div className="max-w-[1400px] mx-auto px-6 py-10 pt-16">
+            <div className="max-w-350 mx-auto px-6 py-10 pt-16">
                     <div className="flex justify-between items-center mb-8 px-4">
                         <h2 className="text-[24px] font-black uppercase italic tracking-tighter">New Arrival</h2>
 
@@ -116,14 +116,14 @@ const Home = () => {
             </div>
 
             {/* Second Banner - Air Force 1 Mid Flax */}
-            <div className="max-w-[1400px] mx-auto px-6 pb-20">
-                <div className="w-full h-[380px] rounded-[24px] overflow-hidden relative shadow-lg group isolate" style={{
+            <div className="max-w-350 mx-auto px-6 pb-20">
+                <div className="w-full h-95 rounded-3xl overflow-hidden relative shadow-lg group isolate" style={{
                     backgroundImage: "url('https://images.unsplash.com/photo-1510134017377-0add0d2aa62f?q=80&w=2000&auto=format&fit=crop')", // autumn leaves
                     backgroundSize: 'cover',
                     backgroundPosition: 'center'
                 }}>
                     <div className="absolute inset-0 bg-black/40 mix-blend-multiply z-0"></div>
-                    <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent z-0"></div>
+                    <div className="absolute inset-0 bg-linear-to-r from-black/80 via-black/40 to-transparent z-0"></div>
 
                     <div className="relative z-10 h-full flex items-center justify-between px-16">
                         <div className="text-white">
@@ -138,7 +138,7 @@ const Home = () => {
                             </button>
                         </div>
 
-                        <div className="w-[550px] relative mt-16 transform transition-transform duration-700 group-hover:-translate-y-4">
+                        <div className="w-137.5 relative mt-16 transform transition-transform duration-700 group-hover:-translate-y-4">
                             <img
                                 src="https://static.nike.com/a/images/t_web_pw_592_v2/f_auto/u_9ddf04c7-2a9a-4d76-add1-d15af8f0263d,c_scale,fl_relative,w_1.0,h_1.0,fl_layer_apply/l8og35sx908n5jwvcbpf/AIR+FORCE+1+MID+%2707+PRM+QS.png"
                                 alt="Air Force 1 Mid Flax"
@@ -154,7 +154,7 @@ const Home = () => {
 
             {/* Footer */}
             <footer className="mt-8 border-t border-gray-100">
-                <div className="max-w-[1400px] mx-auto px-6 py-16 grid grid-cols-1 md:grid-cols-[2fr_1fr_1fr_1fr_1fr] gap-8">
+                <div className="max-w-350 mx-auto px-6 py-16 grid grid-cols-1 md:grid-cols-[2fr_1fr_1fr_1fr_1fr] gap-8">
                     {/* Logo Column */}
                     <div>
                         <h2 className="text-3xl font-black tracking-tighter">

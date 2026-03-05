@@ -163,7 +163,7 @@ const AdminDashboard = () => {
 
             {/* Modal - Requirement: Support product management [cite: 35, 53] */}
             {showModal && (
-                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-100 p-4">
                     <div className="bg-white p-10 max-w-md w-full shadow-2xl rounded-2xl">
                         <h2 className="text-2xl font-black mb-8 uppercase italic tracking-tight text-black border-b pb-4">
                             {isEditing ? 'Update Inventory' : 'Add New Arrival'}
