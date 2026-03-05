@@ -56,6 +56,15 @@ const Home = () => {
         fetchProducts();
     }, [search]);
 
+    const [sortOrder, setSortOrder] = useState(''); // low to high and high to low sort option
+
+    //Logic to sort products
+    const sortedProducts = [...products].sort((a, b) => {
+        if (sortOrder === 'lowToHigh') return a.price - b.price;
+        if (sortOrder === 'highToLow') return b.price - a.price;
+        return 0;
+    });
+
     return (
         <div className="bg-white min-h-screen font-sans">
             <Navbar onSearch={setSearch} />
@@ -76,27 +85,34 @@ const Home = () => {
 
             {/* Product Grid Section */}
             <div className="max-w-[1400px] mx-auto px-6 py-10 pt-16">
-                <div className="flex justify-between items-center mb-8">
-                    <h2 className="text-[20px] font-bold text-black font-sans">New Arrival</h2>
-                    <div className="flex items-center space-x-2">
-                        <button className="flex items-center justify-between space-x-2 border border-gray-300 rounded-full py-1.5 px-4 text-sm font-semibold hover:bg-gray-50 min-w-[100px] text-gray-800">
-                            <span>Sort by</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
-                            </svg>
-                        </button>
-                    </div>
-                </div>
+                    <div className="flex justify-between items-center mb-8 px-4">
+                        <h2 className="text-[24px] font-black uppercase italic tracking-tighter">New Arrival</h2>
 
-                {loading ? (
-                    <div className="flex justify-center py-20"><div className="w-8 h-8 border-4 border-black border-t-transparent rounded-full animate-spin"></div></div>
-                ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {products.map((shoe) => (
-                            <ProductCard key={shoe.id || Math.random()} product={shoe} />
+                        <div className="relative group">
+                            <select
+                                value={sortOrder}
+                                onChange={(e) => setSortOrder(e.target.value)}
+                                className="appearance-none bg-white border border-gray-200 px-4 py-2 pr-8 rounded-md text-sm font-bold focus:outline-none focus:ring-1 focus:ring-black cursor-pointer font-sans"
+                            >
+                                <option value="">Sort By: Featured</option>
+                                <option value="lowToHigh">Price: Low to High</option>
+                                <option value="highToLow">Price: High to Low</option>
+                            </select>
+                            {/* Custom Arrow Icon */}
+                            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                    <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Grid now uses sortedProducts */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 px-4">
+                        {sortedProducts.map((shoe) => (
+                            <ProductCard key={shoe.id} product={shoe} />
                         ))}
                     </div>
-                )}
             </div>
 
             {/* Second Banner - Air Force 1 Mid Flax */}
