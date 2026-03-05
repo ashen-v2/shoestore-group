@@ -47,6 +47,7 @@ class StockBase(SQLModel):
 class Stock(StockBase, table=True):
     id : int = Field(default=None, primary_key=True)
     product_id : int = Field(foreign_key="product.id", nullable=False, ondelete="CASCADE")
+    created_at : datetime = Field(default_factory=lambda : datetime.now(timezone.utc), nullable=False)
 
 class StockRead(StockBase):
     id : int
