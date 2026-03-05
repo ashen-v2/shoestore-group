@@ -1,4 +1,6 @@
-from sqlmodel import Enum, SQLModel, Field
+from typing import List
+
+from sqlmodel import Enum, Relationship, SQLModel, Field
 from datetime import datetime, timezone
 
 class ProductCategory(str, Enum):
@@ -6,6 +8,7 @@ class ProductCategory(str, Enum):
     FORMAL = "formal"
     SPORTS = "sports"
     UNCATEGORIZED = "uncategorized"
+    
 
 class Product(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
@@ -32,3 +35,19 @@ class ProductUpdate(SQLModel):
     category: str | None = None
     price: float | None = None
     image_url: str | None = None
+
+
+"""Stock models"""
+
+class StockBase(SQLModel):
+    size : float = Field(nullable=False)
+    quantity : int = Field(default = 0, nullable=False)
+
+class Stock(StockBase, table=True):
+    id : int = Field(default=None, primary_key=True)
+    product_id : int = Field(foreign_key="product.id", nullable=False, ondelete="CASCADE")
+    product : Product = Relationship(back_populates="stocks")
+
+class StockRead(StockBase):
+    id : int
+    
