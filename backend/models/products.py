@@ -15,3 +15,13 @@ class Product(SQLModel, table=True):
     price: float = Field(nullable=False)
     image_url: str = Field(default="https://placehold.co/600x400", nullable=False)
     created_at: datetime = Field(default_factory=lambda : datetime.now(timezone.utc), nullable=False)
+
+class ProductCreate(SQLModel):
+    name: str 
+    brand: str
+    category: str = Field(default=ProductCategory.UNCATEGORIZED, nullable=False)
+    price: float 
+    image_url: str | None = Field(default="https://placehold.co/600x400", nullable=True)
+
+class ProductRead(Product):
+    pass
