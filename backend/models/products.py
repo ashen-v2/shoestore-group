@@ -1,0 +1,17 @@
+from sqlmodel import Enum, SQLModel, Field
+from datetime import datetime, timezone
+
+class ProductCategory(str, Enum):
+    CASUAL = "casual"
+    FORMAL = "formal"
+    SPORTS = "sports"
+    UNCATEGORIZED = "uncategorized"
+
+class Product(SQLModel, table=True):
+    id: int = Field(default=None, primary_key=True)
+    name: str = Field(nullable=False)
+    brand: str = Field(nullable=False)
+    category: str = Field(default=ProductCategory.UNCATEGORIZED, nullable=False)
+    price: float = Field(nullable=False)
+    image_url: str = Field(default="https://placehold.co/600x400", nullable=False)
+    created_at: datetime = Field(default_factory=lambda : datetime.now(timezone.utc), nullable=False)
