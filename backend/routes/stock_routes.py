@@ -57,3 +57,14 @@ def update_stock(stock_id: int, stock : StockUpdate, session : Session = Depends
     session.refresh(db_stock)
     return db_stock
 
+@router.delete("/{stock_id}", status_code=204)
+def delete_stock(stock_id: int, session : Session = Depends(get_session), current_user : TokenData = Depends(allow_admin_moderator)):
+    """Delete a stock item"""
+    db_stock = session.get(Stock, stock_id)
+    if not db_stock:
+        raise HTTPException(status_code=404, detail="Stock item not found")
+    
+    session.delete(db_stock)
+    session.commit()
+    return
+
