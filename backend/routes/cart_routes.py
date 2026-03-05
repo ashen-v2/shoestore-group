@@ -37,7 +37,7 @@ def add_to_cart(stock_id : int, session : Session = Depends(get_session), curren
     # if cart item already exists, increase quantity, otherwise create a new cart item
     cart_item = session.exec(select(CartItem).where(CartItem.cart_id==cart.id, CartItem.stock_id==stock_id)).first()
 
-    if cart_item.quantity >= stock.quantity:
+    if cart_item is not None and cart_item.quantity >= stock.quantity:
         raise HTTPException(status_code=400, detail="Not enough stock available")
     if cart_item:
         cart_item.quantity += 1
@@ -72,3 +72,15 @@ def update_cart_item(cart_item_id : int, session : Session = Depends(get_session
     session.commit()
     session.refresh(cart_item)
     return cart_item
+
+@router.delete("/{cart_item_id}", status_code=204)
+def delete_cart_item(cart_item_id : int, session : Session = Depends(get_session), current_user : TokenData = Depends(get_current_user)):
+    """Remove an item from the cart"""
+    cart_item = session.get(CartItem, cart_item_id)
+    if not cart_item:
+        raise HTTPException(status_code=404, detail="Cart item not found")
+    cart = session.get(Cart, cart_item.cart_id)
+    if cart.user_id != current_user.user_id:
+        raise HTTPException(status_code=403, detail="Not authorized to delete this cart item")
+    session.delete(cart_item)
+    session.commit()
