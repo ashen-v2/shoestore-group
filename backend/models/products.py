@@ -50,7 +50,12 @@ class Stock(StockBase, table=True):
 
 class StockRead(StockBase):
     id : int
+    product_id : int
 
 class StockCreate(StockBase):
     pass
+
+class StockUpdate(SQLModel):
+    size : float | None = None
+    quantity : int | None = None
     
