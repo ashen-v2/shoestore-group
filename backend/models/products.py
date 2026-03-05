@@ -18,6 +18,7 @@ class Product(SQLModel, table=True):
     price: float = Field(nullable=False)
     image_url: str = Field(default="https://placehold.co/600x400", nullable=False)
     created_at: datetime = Field(default_factory=lambda : datetime.now(timezone.utc), nullable=False)
+    
 
 class ProductCreate(SQLModel):
     name: str 
@@ -46,8 +47,10 @@ class StockBase(SQLModel):
 class Stock(StockBase, table=True):
     id : int = Field(default=None, primary_key=True)
     product_id : int = Field(foreign_key="product.id", nullable=False, ondelete="CASCADE")
-    product : Product = Relationship(back_populates="stocks")
 
 class StockRead(StockBase):
     id : int
+
+class StockCreate(StockBase):
+    pass
     

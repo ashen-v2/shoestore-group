@@ -2,7 +2,7 @@ from fastapi import Depends, FastAPI
 from fastapi.concurrency import asynccontextmanager
 from db.session import engine, get_session
 from fastapi.middleware.cors import CORSMiddleware
-from routes import user_routes, product_routes
+from routes import user_routes, product_routes, stock_routes
 
 
 @asynccontextmanager
@@ -25,6 +25,7 @@ app.add_middleware(
 
 app.include_router(user_routes.router)
 app.include_router(product_routes.router)
+app.include_router(stock_routes.router)
 
 @app.get("/")
 async def root():
