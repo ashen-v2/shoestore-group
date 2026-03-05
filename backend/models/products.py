@@ -25,3 +25,10 @@ class ProductCreate(SQLModel):
 
 class ProductRead(Product):
     pass
+
+class ProductUpdate(SQLModel):
+    name: str | None = None
+    brand: str | None = None
+    category: str | None = None
+    price: float | None = None
+    image_url: str | None = None
