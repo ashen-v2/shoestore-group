@@ -57,5 +57,24 @@ def create_order( session : Session = Depends(get_session), current_user : Token
     session.commit()
     session.refresh(order)
     return order
+
+@router.delete("/{order_id}", status_code=204)
+def delete_order(order_id : int, session : Session = Depends(get_session), current_user : TokenData = Depends(get_current_user)):
+    """Delete an order by ID"""
+    order : Order = session.get(Order, order_id)
+    if not order or order.user_id != current_user.user_id:
+        raise HTTPException(status_code=404, detail="Order not found")
+    if order.payment_status != "pending" and order.delivery_status != "pending":
+        raise HTTPException(status_code=400, detail="Only pending orders can be deleted")
+    
+    order_items : list[OrderItem] = session.exec(select(OrderItem).where(OrderItem.order_id == order_id)).all()
+    for order_item in order_items :
+        stock : Stock = session.get(Stock, order_item.stock_id)
+        stock.quantity += order_item.quantity
+        session.add(stock)
+    
+    session.delete(order)
+    session.commit()
+    return
     
     
