@@ -234,7 +234,7 @@ const AdminDashboard = () => {
 
             {/* Stock Management Modal */}
             {showStockModal && (
-                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-100 p-4">
                     <div className="bg-white p-8 max-w-lg w-full shadow-2xl rounded-2xl">
                         <div className="flex justify-between items-center mb-6 border-b pb-4">
                             <div>

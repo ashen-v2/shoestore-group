@@ -12,6 +12,7 @@ import Cart from './pages/customer/Cart';
 import Profile from './pages/customer/Profile';
 import Orders from './pages/customer/Orders';
 import ProductDetails from './pages/customer/ProductDetails';
+import Checkout from './pages/customer/Checkout';
 
 // Role-Based Guard Component
 const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -40,7 +41,7 @@ function App() {
             <Route path="/cart" element={<Cart />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/orders" element={<Orders />} />
-
+            <Route path="/checkout" element={<Checkout />} />
 
             {/* Admin Routes*/}
              <Route

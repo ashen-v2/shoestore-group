@@ -15,7 +15,7 @@ const Cart = () => {
     return (
         <div className="bg-gray-50 min-h-screen pb-20">
             <Navbar />
-            
+
             <div className="max-w-6xl mx-auto px-6 py-12">
                 <h1 className="text-4xl font-black uppercase italic tracking-tighter text-black mb-8">
                     Your Bag
@@ -30,17 +30,17 @@ const Cart = () => {
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-                        
+
                         {/* Cart Items List */}
                         <div className="lg:col-span-2 space-y-4">
                             {cartItems.map((item) => (
                                 <div key={item.id} className="bg-white p-6 flex gap-6 border border-gray-100 shadow-sm relative group">
-                                    
+
                                     {/* Product Image */}
                                     <div className="w-32 h-32 bg-gray-100 flex-shrink-0">
-                                        <img 
-                                            src={item.stock?.product?.image_url} 
-                                            alt={item.stock?.product?.name} 
+                                        <img
+                                            src={item.stock?.product?.image_url}
+                                            alt={item.stock?.product?.name}
                                             className="w-full h-full object-cover"
                                         />
                                     </div>
@@ -67,18 +67,18 @@ const Cart = () => {
                                         {/* Quantity & Actions */}
                                         <div className="flex items-center justify-between mt-4">
                                             <div className="flex items-center border border-gray-200">
-                                                <button 
+                                                <button
                                                     onClick={() => updateQuantity(item.id, item.quantity - 1)}
                                                     className="px-3 py-1 font-bold hover:bg-gray-50 text-gray-600"
                                                     disabled={item.quantity <= 1}
                                                 >-</button>
                                                 <span className="px-4 py-1 font-black text-sm">{item.quantity}</span>
-                                                <button 
+                                                <button
                                                     onClick={() => updateQuantity(item.id, item.quantity + 1)}
                                                     className="px-3 py-1 font-bold hover:bg-gray-50 text-gray-600"
                                                 >+</button>
                                             </div>
-                                            <button 
+                                            <button
                                                 onClick={() => removeFromCart(item.id)}
                                                 className="text-[10px] font-black uppercase tracking-widest text-red-500 hover:underline"
                                             >
@@ -94,7 +94,7 @@ const Cart = () => {
                         <div className="lg:col-span-1">
                             <div className="bg-white p-8 border border-gray-100 shadow-sm sticky top-24">
                                 <h2 className="text-xl font-black uppercase italic tracking-tighter text-black mb-6">Summary</h2>
-                                
+
                                 <div className="space-y-4 text-sm font-bold text-gray-600 border-b border-gray-100 pb-6 mb-6">
                                     <div className="flex justify-between">
                                         <span>Subtotal</span>
@@ -115,9 +115,12 @@ const Cart = () => {
                                     <span className="text-2xl font-black italic text-black">${subtotal.toFixed(2)}</span>
                                 </div>
 
-                                <button className="w-full bg-black text-white py-4 font-black uppercase text-xs tracking-widest hover:bg-gray-800 shadow-lg active:scale-95 transition-all">
+                                <Link
+                                    to="/checkout"
+                                    className="block text-center w-full bg-black text-white py-4 font-black uppercase text-xs tracking-widest hover:bg-gray-800 shadow-lg active:scale-95 transition-all"
+                                >
                                     Checkout Now
-                                </button>
+                                </Link>
                             </div>
                         </div>
                     </div>
