@@ -15,6 +15,11 @@ class StripeClient:
                 amount= order_amount,
                 currency=currency,
                 description=description,
+
+                automatic_payment_methods={
+                    "enabled": True,
+                    "allow_redirects": "never"
+                }
             )
             payment.transaction_id = intent.id
             session.add(payment)
@@ -30,16 +35,17 @@ class StripeClient:
         """Verify Stripe webhook signature"""
         try:
             event = stripe.Webhook.construct_event(
-                payload, stripe_signature, settings.stripe_webhook_secret
+                payload, stripe_signature, settings.stripe_web_hook_secret
             )
         except ValueError as e:
             raise Exception(f"Invalid payload: {str(e)}")
         except stripe.error.SignatureVerificationError as e:
             raise Exception(f"Invalid signature: {str(e)}")
-        
+    
         if event['type'] == 'payment_intent.succeeded':
             payment_intent = event['data']['object']
             transaction_id = payment_intent['id']
+            print(f"Payment Intent Succeeded: {transaction_id}")
             payment = session.exec(select(Payment).where(Payment.transaction_id == transaction_id)).first()
             payment.status = "completed"
             session.add(payment)
@@ -48,3 +54,7 @@ class StripeClient:
             session.add(order)
             session.commit()
             return {"message": "Payment verified and order updated"}
+        else:
+            return {"message": f"Unhandled event type: {event['type']}"}
+        
+
