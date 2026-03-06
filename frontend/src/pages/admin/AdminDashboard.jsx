@@ -8,6 +8,11 @@ const AdminDashboard = () => {
     const [isEditing, setIsEditing] = useState(false);
     const [currentProductId, setCurrentProductId] = useState(null);
 
+    const [showStockModal, setShowStockModal] = useState(false);
+    const [selectedProductStock, setSelectedProductStock] = useState(null); //Holds the product whose stock is being edited
+    const [stockList, setStockList] = useState([]); //Holds the size and quantity pairs for the selected product
+    const [newStock, setNewStock] = useState({ size: '', quantity: 0 }); //For adding new stock entries in the modal
+
     const [productForm, setProductForm] = useState({
         name: '', brand: '', category: 'uncategorized', price: 0, image_url: 'https://placehold.co/600x400'
     });
@@ -27,6 +32,48 @@ const AdminDashboard = () => {
             setProducts(response.data);
         } catch (err) {
             console.error("Failed to fetch inventory", err);
+        }
+    };
+
+    // Stock Modal Logic
+    const openStockModal = async (product) => {
+        setSelectedProductStock(product);
+        try {
+            // Hits the GET /sticks/{product_id} route
+            const response = await api.get(`/stocks/${product.id}`);
+            setStockList(response.data);
+            setShowStockModal(true);
+        } catch (err) {
+            console.error("Failed to fetch stock data", err);
+        }
+    };
+
+    // Add new size/quantity pair to the stock list
+    const handleAddStock = async () => {
+        e.preventDefault();
+        try {
+            // Hits the POST /stocks/{product_id} route
+            await api.post(`/stocks/${selectedProductStock.id}`, newStock);
+            setNewStock({ size: 0, quanitity: 0 }); //Reset form
+
+            //Refresh the list
+            const response = await api.get(`/stocks/${selectedProductStock.id}`);
+            setStockList(response.data);
+        } catch (err) {
+            alert(err.response?.data?.detail || "Failed to add stock. Check console.");
+        }
+    };
+
+    // Delete a size pair from the stock list
+    const handleDeleteStock = async (stockId) => {
+        if (window.confirm("Remove this size?")) {
+            try {
+                // Hits the DELETE /stocks/{stock_id} route
+                await api.delete(`/stocks/${stockId}`);
+                setStockList(stockList.filter(s => s.id !== stockId));
+            } catch (err) {
+                alert(err.response?.data?.detail || "Failed to delete stock. Check console.");
+            }
         }
     };
 
@@ -150,6 +197,13 @@ const AdminDashboard = () => {
                                         <td className="p-5 text-gray-400 text-xs font-black uppercase tracking-widest">{product.category}</td>
                                         <td className="p-5 text-sm font-black italic text-black">${product.price}</td>
                                         <td className="p-5 text-right space-x-4">
+                                            {/* New Stock Button */}
+                                            <button
+                                                onClick={() => openStockModal(product)}
+                                                className="text-green-600 font-black text-[10px] uppercase tracking-widest hover:underline"
+                                            >
+                                                Stock
+                                            </button>
                                             <button onClick={() => openEditModal(product)} className="text-blue-600 font-black text-[10px] uppercase tracking-widest hover:underline">Edit</button>
                                             <button onClick={() => handleDelete(product.id)} className="text-red-500 font-black text-[10px] uppercase tracking-widest hover:underline">Delete</button>
                                         </td>
@@ -160,6 +214,84 @@ const AdminDashboard = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Stock Management Modal */}
+            {showStockModal && (
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
+                    <div className="bg-white p-8 max-w-lg w-full shadow-2xl rounded-2xl">
+                        <div className="flex justify-between items-center mb-6 border-b pb-4">
+                            <div>
+                                <h2 className="text-2xl font-black uppercase italic tracking-tight text-black">
+                                    Manage Stock
+                                </h2>
+                                <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mt-1">
+                                    {selectedProductStock?.name}
+                                </p>
+                            </div>
+                            <button onClick={() => setShowStockModal(false)} className="text-gray-400 hover:text-black font-black text-xl">&times;</button>
+                        </div>
+
+                        {/* Existing Stock List */}
+                        <div className="mb-8 max-h-48 overflow-y-auto pr-2">
+                            {stockList.length === 0 ? (
+                                <p className="text-sm text-gray-500 italic">No sizes added yet.</p>
+                            ) : (
+                                <table className="w-full text-left">
+                                    <thead className="text-[10px] uppercase font-black text-gray-400 border-b">
+                                        <tr>
+                                            <th className="pb-2">Size</th>
+                                            <th className="pb-2">Quantity</th>
+                                            <th className="pb-2 text-right">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-50">
+                                        {stockList.map(stock => (
+                                            <tr key={stock.id} className="hover:bg-gray-50">
+                                                <td className="py-2 font-bold text-sm">US {stock.size}</td>
+                                                <td className="py-2 font-bold text-sm">{stock.quantity} Units</td>
+                                                <td className="py-2 text-right">
+                                                    <button
+                                                        onClick={() => handleDeleteStock(stock.id)}
+                                                        className="text-red-500 text-[10px] font-black uppercase tracking-widest hover:underline"
+                                                    >
+                                                        Remove
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            )}
+                        </div>
+
+                        {/* Add New Stock Form */}
+                        <form onSubmit={handleAddStock} className="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                            <h3 className="text-xs font-black uppercase tracking-widest mb-3 text-black">Add New Size</h3>
+                            <div className="flex space-x-3">
+                                <div className="flex-1">
+                                    <input
+                                        type="number" step="0.5" placeholder="Size (e.g. 9.5)" required
+                                        className="w-full border-2 border-white p-2 font-bold text-sm outline-none focus:border-black"
+                                        value={newStock.size || ''}
+                                        onChange={(e) => setNewStock({ ...newStock, size: parseFloat(e.target.value) })}
+                                    />
+                                </div>
+                                <div className="flex-1">
+                                    <input
+                                        type="number" placeholder="Quantity" required
+                                        className="w-full border-2 border-white p-2 font-bold text-sm outline-none focus:border-black"
+                                        value={newStock.quantity || ''}
+                                        onChange={(e) => setNewStock({ ...newStock, quantity: parseInt(e.target.value) })}
+                                    />
+                                </div>
+                                <button type="submit" className="bg-black text-white px-4 py-2 font-black text-[10px] uppercase tracking-widest hover:bg-gray-800 transition-colors">
+                                    Add
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
 
             {/* Modal */}
             {showModal && (
