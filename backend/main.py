@@ -2,7 +2,7 @@ from fastapi import Depends, FastAPI
 from fastapi.concurrency import asynccontextmanager
 from db.session import engine, get_session
 from fastapi.middleware.cors import CORSMiddleware
-from routes import user_routes, product_routes, stock_routes, cart_routes
+from routes import user_routes, product_routes, stock_routes, cart_routes, order_routes, payment_routes
 
 
 @asynccontextmanager
@@ -27,6 +27,8 @@ app.include_router(user_routes.router)
 app.include_router(product_routes.router)
 app.include_router(stock_routes.router)
 app.include_router(cart_routes.router)
+app.include_router(order_routes.router)
+app.include_router(payment_routes.router)
 
 @app.get("/")
 async def root():
