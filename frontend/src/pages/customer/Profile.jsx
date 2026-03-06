@@ -4,10 +4,10 @@ import api from '../../api/axiosConfig';
 import Navbar from '../../components/common/Navbar';
 
 const Profile = () => {
-    const { user, login } = useAuth(); // Assuming your AuthContext has a way to update the user session
+    const { user, login, fetchCurrentUser } = useAuth(); //to refresh session after profile update
     const [status, setStatus] = useState({ type: '', message: ''});
 
-    // 1. Added profile_image_url to the initial state
+    // Added profile_image_url to the initial state
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -17,32 +17,30 @@ const Profile = () => {
         password: '' 
     });
 
-    // Fetch the full user data from the database when the component loads
+    // Fetch fresh data directly from the backend when the page opens
     useEffect(() => {
-        const fetchUserProfile = async () => {
-            if (user && user.id) {
-                try {
-                    const response = await api.get(`/users/me`);
-                    const fullUserData = response.data;
-                    
-                    // 2. Map the fetched profile_image_url to the form
-                    setFormData({
-                        name: fullUserData.name || '',
-                        email: fullUserData.email || '',
-                        address: fullUserData.address || '',
-                        payment_preference: fullUserData.payment_preference || 'Credit Card',
-                        profile_image_url: fullUserData.profile_image_url || '', 
-                        password: '' 
-                    });
-                } catch (error) {
-                    setStatus({ type: 'error', message: 'Could not load profile data.' });
-                    console.error("Failed to fetch user profile:", error);
-                }
+        const fetchFreshProfile = async () => {
+            try {
+                // Ensure frontend session is up-to-date with the latest user data from the backend
+                const response = await api.get('/users/me');
+                const latestData = response.data;
+                
+                // Immediately populate the form
+                setFormData({
+                    name: latestData.name || '',
+                    email: latestData.email || '',
+                    address: latestData.address || '',
+                    profile_image_url: latestData.profile_image_url || '',
+                    payment_preference: latestData.payment_preference || 'Credit Card',
+                    password: '' // Always blank for security
+                });
+            } catch (err) {
+                console.error("Could not fetch fresh profile data:", err);
             }
         };
 
-        fetchUserProfile();
-    }, [user]);
+        fetchFreshProfile();
+    }, []); // The empty array [] means this runs exactly once every time you navigate to this page
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -56,6 +54,13 @@ const Profile = () => {
 
             // Calls the backend to update the user
             await api.patch(`/users/me`, payload);
+
+            if (fetchCurrentUser) {
+                await fetchCurrentUser();
+            }
+
+            // After successful update, fetch the updated user data to refresh the session
+            await fetchCurrentUser();
 
             setStatus({ type: 'success', message: 'Profile updated successfully!' });
 

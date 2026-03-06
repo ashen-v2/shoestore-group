@@ -4,9 +4,37 @@ import { jwtDecode } from 'jwt-decode';
 
 const AuthContext = createContext();
 
+export const useAuth = () => useContext(AuthContext);
+
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
+
+    // Optional: Function to fetch current user details from the backend using the token
+    const fetchCurrentUser = async () => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            setUser(null);
+            setLoading(false);
+            return;
+        }
+
+        try {
+            // Hits the endpoint that returns current user details based on the token
+            const response = await api.get('/users/me');
+            setUser(response.data);
+        } catch (error) {
+            console.error("Failed to fetch user session", error);
+            setUser(null);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Run this whenever the app loads
+    useEffect(() => {
+        fetchCurrentUser();
+    }, []);
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -33,6 +61,7 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem('token', access_token);
         const decode = jwtDecode(access_token);
         setUser({ id: decode.user_id, role: decode.role });
+        await fetchCurrentUser(); // Fetch user details after login
         return decode.role;
     };
 
@@ -42,12 +71,11 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, logout, loading }}>
+        <AuthContext.Provider value={{ user, login, logout, fetchCurrentUser,loading }}>
             {!loading && children}
         </AuthContext.Provider>
     );
 };
 
-export const useAuth = () => useContext(AuthContext);
 
 export default AuthContext;

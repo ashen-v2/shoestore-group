@@ -78,11 +78,15 @@ const Navbar = ({ onSearch }) => {
                     {/* Conditional Rendering for Profile/Auth */}
                     {user ? (
                         <div className="relative">
-                            <div 
+                            <div
                                 className="w-10 h-10 rounded-full overflow-hidden cursor-pointer border-2 border-transparent hover:border-black transition-all"
                                 onClick={() => setIsProfileOpen(!isProfileOpen)}
                             >
-                                <img src={user.profile_image_url || "https://i.pravatar.cc/150?img=11"} alt="Profile" className="w-full h-full object-cover" />
+                                <img
+                                    src={user.profile_image_url || `https://ui-avatars.com/api/?name=${user.name || user.email}&background=000000&color=fff&bold=true`}
+                                    alt="Profile"
+                                    className="w-full h-full object-cover"
+                                />
                             </div>
 
                             {/* Profile Dropdown Menu */}
@@ -92,19 +96,19 @@ const Navbar = ({ onSearch }) => {
                                         <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Account</p>
                                         <p className="text-xs font-bold truncate text-black">{user.email || user.username}</p>
                                     </div>
-                                    
+
                                     {/* Link to Profile */}
-                                    <Link 
-                                        to="/profile" 
+                                    <Link
+                                        to="/profile"
                                         className="block px-4 py-2 text-xs font-bold text-gray-700 hover:bg-gray-50 hover:text-black"
                                         onClick={() => setIsProfileOpen(false)}
                                     >
                                         Profile Settings
                                     </Link>
-                                    
+
                                     {/* Link to Orders */}
-                                    <Link 
-                                        to="/orders" 
+                                    <Link
+                                        to="/orders"
                                         className="block px-4 py-2 text-xs font-bold text-gray-700 hover:bg-gray-50 hover:text-black"
                                         onClick={() => setIsProfileOpen(false)}
                                     >
@@ -112,8 +116,8 @@ const Navbar = ({ onSearch }) => {
                                     </Link>
 
                                     {user.role === 'admin' && (
-                                        <Link 
-                                            to="/admin" 
+                                        <Link
+                                            to="/admin"
                                             className="block px-4 py-2 text-xs font-bold text-red-600 hover:bg-red-50"
                                             onClick={() => setIsProfileOpen(false)}
                                         >
@@ -121,7 +125,7 @@ const Navbar = ({ onSearch }) => {
                                         </Link>
                                     )}
 
-                                    <button 
+                                    <button
                                         onClick={() => {
                                             logout();
                                             setIsProfileOpen(false);
@@ -133,11 +137,11 @@ const Navbar = ({ onSearch }) => {
                                 </div>
                             )}
                         </div>
-                    ):(
+                    ) : (
                         <div className="flex items-center space-x-4 font-bold text-[12px] uppercase tracking-tight">
                             <Link to="/login" className="hover:text-gray-600">Login</Link>
-                            <Link 
-                                to="/register" 
+                            <Link
+                                to="/register"
                                 className="bg-black text-white px-4 py-2 rounded-full hover:bg-gray-800 transition-colors"
                             >
                                 Sign Up

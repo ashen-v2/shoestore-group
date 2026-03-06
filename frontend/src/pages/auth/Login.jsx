@@ -6,17 +6,22 @@ const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [isLoading, setIsLoading] = useState(false); // Added a loading state
+    
     const { login } = useAuth();
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
+        setIsLoading(true); // Lock the button and start loading
+
         try {
-            // The login function in AuthContext handles the FormData and Axios call
+            // The login function in AuthContext MUST have `await fetchCurrentUser()` 
+            // inside it for this to wait for the profile image!
             const role = await login(email, password);
             
-            // Redirect based on role (Requirement: Role-Based Access Control)
+            // Redirect based on role
             if (role === 'admin') {
                 navigate('/admin');
             } else {
@@ -24,6 +29,7 @@ const Login = () => {
             }
         } catch (err) {
             setError('Invalid email or password. Please try again.');
+            setIsLoading(false); // Only stop loading if there is an error
         }
     };
 
@@ -41,8 +47,9 @@ const Login = () => {
                 </div>
 
                 <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+                    {/* Error Message */}
                     {error && (
-                        <div className="bg-red-50 p-3 text-sm text-red-500 border-l-4 border-red-500">
+                        <div className="bg-red-50 p-3 text-sm font-bold text-red-500 border-l-4 border-red-500 uppercase tracking-widest">
                             {error}
                         </div>
                     )}
@@ -52,20 +59,22 @@ const Login = () => {
                             <input
                                 type="email"
                                 required
-                                className="relative block w-full border-2 border-gray-200 p-3 text-gray-900 placeholder-gray-500 focus:border-black focus:outline-none sm:text-sm"
+                                className="relative block w-full border-2 border-gray-200 p-3 text-gray-900 placeholder-gray-500 focus:border-black focus:outline-none sm:text-sm font-bold transition-colors"
                                 placeholder="Email Address"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
+                                disabled={isLoading} // Prevent typing while loading
                             />
                         </div>
                         <div>
                             <input
                                 type="password"
                                 required
-                                className="relative block w-full border-2 border-gray-200 p-3 text-gray-900 placeholder-gray-500 focus:border-black focus:outline-none sm:text-sm"
+                                className="relative block w-full border-2 border-gray-200 p-3 text-gray-900 placeholder-gray-500 focus:border-black focus:outline-none sm:text-sm font-bold transition-colors"
                                 placeholder="Password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
+                                disabled={isLoading} // Prevent typing while loading
                             />
                         </div>
                     </div>
@@ -73,17 +82,20 @@ const Login = () => {
                     <div>
                         <button
                             type="submit"
-                            className="group relative flex w-full justify-center bg-black py-3 px-4 text-sm font-bold text-white uppercase tracking-widest hover:bg-gray-800 focus:outline-none"
+                            disabled={isLoading} // Disable the button while it fetches the image
+                            className={`group relative flex w-full justify-center py-4 px-4 text-sm font-black text-white uppercase tracking-widest transition-all ${
+                                isLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-black hover:bg-gray-800 active:scale-[0.98]'
+                            }`}
                         >
-                            Sign In
+                            {isLoading ? 'Signing In...' : 'Sign In'}
                         </button>
                     </div>
                 </form>
 
                 <div className="text-center">
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm font-bold text-gray-400 uppercase tracking-widest">
                         Not a member? {' '}
-                        <Link to="/register" className="font-bold text-black underline hover:text-gray-700">
+                        <Link to="/register" className="font-black text-black underline hover:text-gray-700">
                             Join us.
                         </Link>
                     </p>

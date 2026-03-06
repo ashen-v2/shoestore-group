@@ -1,37 +1,29 @@
-import { useCart } from '../../context/CartContext';
+import { Link } from 'react-router-dom';
 
 const ProductCard = ({ product }) => {
-    const { addToCart } = useCart();
-
     return (
-        <div className="group cursor-pointer bg-white transition-all duration-300">
-            <div className="relative aspect-square overflow-hidden bg-[#F6F6F6] mb-4">
+        // Wrap the whole card (or just the image/title) in a Link to the new page
+        <Link to={`/products/${product.id}`} className="block group cursor-pointer">
+            <div className=" relative overflow-hidden mb-4 aspect-square flex items-center justify-center p-2">
                 <img 
-                    src={product.image_url || 'https://via.placeholder.com/400x400?text=No+Image'} 
-                    alt={product.name}
-                    className="h-full w-full object-contain object-center group-hover:scale-105 transition-transform duration-500"
+                    src={product.image_url} 
+                    alt={product.name} 
+                    className="w-full h-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-500" 
                 />
-                
-                {/* Hover Action */}
-                <div className="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-                    <button 
-                        onClick={(e) => {
-                            e.stopPropagation(); // Prevents navigating to details if add a detail page later
-                            addToCart(product);
-                        }}
-                        className="w-full bg-black text-white text-xs font-bold uppercase py-3 hover:bg-gray-800"
-                    >
-                        Add to Bag
-                    </button>
+            </div>
+            
+            <div className="flex justify-between items-start mt-4">
+                <div>
+                    <h3 className="font-black text-sm uppercase tracking-tight text-black group-hover:text-gray-500 transition-colors">
+                        {product.name}
+                    </h3>
+                    <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest mt-1">
+                        {product.brand}
+                    </p>
                 </div>
+                <span className="font-black italic text-sm text-black">${product.price}</span>
             </div>
-
-            <div className="space-y-1">
-                <h3 className="text-sm font-bold text-black">{product.name}</h3>
-                <p className="text-sm text-gray-500 font-medium">{product.brand}</p>
-                <p className="text-sm font-black text-black mt-1">${product.price}</p>
-            </div>
-        </div>
+        </Link>
     );
 };
 

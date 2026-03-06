@@ -49,20 +49,37 @@ const AdminDashboard = () => {
     };
 
     // Add new size/quantity pair to the stock list
-    const handleAddStock = async () => {
-        e.preventDefault();
-        try {
-            // Hits the POST /stocks/{product_id} route
-            await api.post(`/stocks/${selectedProductStock.id}`, newStock);
-            setNewStock({ size: 0, quanitity: 0 }); //Reset form
+    const handleAddStock = async (e) => {
+    e.preventDefault();
+    e.stopPropagation(); // Prevents triggering any accidental parent forms
 
-            //Refresh the list
-            const response = await api.get(`/stocks/${selectedProductStock.id}`);
-            setStockList(response.data);
-        } catch (err) {
+    try {
+        // 1. Force the inputs into strict Numbers before sending to FastAPI
+        const payload = {
+            size: parseFloat(newStock.size),
+            quantity: parseInt(newStock.quantity, 10)
+        };
+
+        // 2. Send to the backend
+        await api.post(`/stocks/${selectedProductStock.id}`, payload);
+        
+        // 3. Reset form and refresh list on success
+        setNewStock({ size: '', quantity: '' }); 
+        const response = await api.get(`/stocks/${selectedProductStock.id}`);
+        setStockList(response.data);
+        
+    } catch (err) {
+        // 4. Catch FastAPI's specific 422 Array format so it doesn't fail silently
+        if (err.response?.status === 422) {
+            const errorDetails = err.response.data.detail[0];
+            alert(`Backend Validation Error: The field '${errorDetails.loc[1]}' ${errorDetails.msg}`);
+            console.error("FastAPI Error:", err.response.data.detail);
+        } else {
             alert(err.response?.data?.detail || "Failed to add stock. Check console.");
+            console.error("Stock Add Error:", err);
         }
-    };
+    }
+};
 
     // Delete a size pair from the stock list
     const handleDeleteStock = async (stockId) => {
