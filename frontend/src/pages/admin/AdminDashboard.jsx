@@ -71,14 +71,14 @@ const AdminDashboard = () => {
         }
     };
 
-    // Analytics Logic - Requirement: Business Insights 
+    // Analytics Logic
     const totalStock = products.length;
     const nikeCount = products.filter(p => p.brand.toLowerCase() === 'nike').length;
     const adidasCount = products.filter(p => p.brand.toLowerCase() === 'adidas').length;
 
     return (
         <div className="flex min-h-screen bg-gray-50">
-            {/* Left Sidebar - Requirement: Role-based access control navigation [cite: 56, 70] */}
+            {/* Left Sidebar */}
             <AdminSidebar />
 
             {/* Main Content Area */}
@@ -91,7 +91,7 @@ const AdminDashboard = () => {
                         <p className="text-gray-500 font-medium">Manage your inventory and monitor business trends.</p>
                     </div>
 
-                    {/* Analytics Cards - Requirement: Business Insights & Trend Analysis  */}
+                    {/* Analytics Cards */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                         <div className="bg-white p-6 shadow-sm border border-gray-100 rounded-xl">
                             <p className="text-gray-400 text-xs uppercase font-black tracking-widest mb-1">Total Inventory</p>
@@ -107,7 +107,7 @@ const AdminDashboard = () => {
                         </div>
                     </div>
 
-                    {/* Sales Trend Visualization - Requirement: Analyse trends for business insights  */}
+                    {/* Sales Trend Visualization */}
                     <div className="bg-white p-8 border border-gray-100 shadow-sm rounded-xl mb-12">
                         <div className="flex justify-between items-center mb-6">
                             <h3 className="text-black text-sm font-black uppercase italic tracking-wider">Weekly Sales Performance</h3>
@@ -123,7 +123,7 @@ const AdminDashboard = () => {
                         </div>
                     </div>
 
-                    {/* Inventory Table Section - Requirement: Inventory management tools [cite: 49, 85] */}
+                    {/* Inventory Table Section*/}
                     <div className="flex justify-between items-center mb-6">
                         <h2 className="text-2xl font-black uppercase tracking-tighter italic">Inventory Management</h2>
                         <button onClick={openAddModal} className="bg-black text-white px-8 py-3 font-bold uppercase text-xs tracking-widest hover:bg-gray-800 transition-all shadow-lg active:scale-95">
@@ -161,7 +161,7 @@ const AdminDashboard = () => {
                 </div>
             </div>
 
-            {/* Modal - Requirement: Support product management [cite: 35, 53] */}
+            {/* Modal */}
             {showModal && (
                 <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-100 p-4">
                     <div className="bg-white p-10 max-w-md w-full shadow-2xl rounded-2xl">
