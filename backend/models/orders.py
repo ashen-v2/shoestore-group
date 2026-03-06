@@ -70,3 +70,7 @@ class OrderItemRead(SQLModel):
     stock_id : int
     quantity : int
     price_locked : float
+
+class ReadOrderOrderItems(SQLModel):
+    order : Order
+    order_items : list[OrderItemRead]
