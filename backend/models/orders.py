@@ -13,6 +13,7 @@ class PAYMENT_STATUS(str,Enum):
     COMPLETED = "completed"
     FAILED = "failed"
     REFUNDED = "refunded"
+    COD_PENDING = "cod_pending"
 
 """Cart models"""
 

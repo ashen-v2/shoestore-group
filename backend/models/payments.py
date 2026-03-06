@@ -12,6 +12,7 @@ class PAYMENT_STATUS(str,Enum):
     COMPLETED = "completed"
     FAILED = "failed"
     REFUNDED = "refunded"
+    COD_PENDING = "cod_pending"
 
 class Payment(SQLModel, table=True):
     id : int = Field(primary_key=True, nullable=False)
@@ -21,3 +22,6 @@ class Payment(SQLModel, table=True):
     status : str = Field(default=PAYMENT_STATUS.PENDING, nullable=False)
     transaction_id : str | None = Field(default=None, nullable=True)
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc), nullable=False)
+
+class PaymentRequest(SQLModel):
+    payment_type : PAYMENT_METHOD
