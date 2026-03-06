@@ -3,7 +3,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import Session, select
 from dependancies.dependancies import get_current_user, allow_admin
 from db.session import get_session
-from models.users import UserCreate, User, UserRead
+from models.users import UserCreate, User, UserRead, UserUpdate
 from models.tokens import TokenData, TokenBase
 from utils import hash_password, verify_password
 from oauth2 import create_access_token
@@ -43,5 +43,20 @@ def login( userlogin : OAuth2PasswordRequestForm = Depends(), session: Session =
         return {"access_token": access_token, "token_type": "bearer"}
     except Exception as e:
         raise HTTPException(status_code=400, detail="Login failed")
-
+    
+@router.patch("/me", response_model=UserRead)
+def user_update(user_update : UserUpdate, session : Session = Depends(get_session), current_user : TokenData = Depends(get_current_user)):
+    """Update the current user's information"""
+    user = session.get(User, current_user.user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    user_data = user_update.model_dump(exclude_unset=True)  
+    for key, value in user_data.items():
+        setattr(user, key, value)
+    
+    session.add(user)
+    session.commit()
+    session.refresh(user)
+    return user
 

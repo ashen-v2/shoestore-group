@@ -22,7 +22,9 @@ class UserLogin(SQLModel):
     email: EmailStr = Field(max_length=100 , nullable=False)
     password: str = Field(max_length=100, nullable=False)
 
-class Userupdate(UserBase):
-    pass
+class UserUpdate(UserBase):
+    name : str | None = None
+    email : EmailStr | None = None
+    profile_image_url : str | None = None
 
 
