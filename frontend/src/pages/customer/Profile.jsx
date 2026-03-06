@@ -4,15 +4,17 @@ import api from '../../api/axiosConfig';
 import Navbar from '../../components/common/Navbar';
 
 const Profile = () => {
-    const { user } = useAuth(); // Get the logged-in user's data
+    const { user, login } = useAuth(); // Assuming your AuthContext has a way to update the user session
     const [status, setStatus] = useState({ type: '', message: ''});
 
+    // 1. Added profile_image_url to the initial state
     const [formData, setFormData] = useState({
         name: '',
         email: '',
         address: '',
         payment_preference: 'Credit Card',
-        password: '' // Left blank intentionally for security reasons
+        profile_image_url: '', 
+        password: '' 
     });
 
     // Fetch the full user data from the database when the component loads
@@ -20,17 +22,17 @@ const Profile = () => {
         const fetchUserProfile = async () => {
             if (user && user.id) {
                 try {
-                    // Fetch the specific user's full data from the backend
-                    const response = await api.get(`/users/${user.id}`);
+                    const response = await api.get(`/users/me`);
                     const fullUserData = response.data;
                     
-                    // Pre-fill the form with the fetched data
+                    // 2. Map the fetched profile_image_url to the form
                     setFormData({
                         name: fullUserData.name || '',
                         email: fullUserData.email || '',
                         address: fullUserData.address || '',
                         payment_preference: fullUserData.payment_preference || 'Credit Card',
-                        password: '' //leave this blank for security
+                        profile_image_url: fullUserData.profile_image_url || '', 
+                        password: '' 
                     });
                 } catch (error) {
                     setStatus({ type: 'error', message: 'Could not load profile data.' });
@@ -40,27 +42,26 @@ const Profile = () => {
         };
 
         fetchUserProfile();
-    }, [user]); // Runs whenever the 'user' session state is ready
+    }, [user]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setStatus({ type: 'loading', message: 'Updating profile...' });
 
         try {
-            // Create a payload If the password field is empty. remove it so we don't overwrite it with a blank string
             const payload = { ...formData };
             if (!payload.password) {
                 delete payload.password;
             }
 
             // Calls the backend to update the user
-            await api.patch(`/users/${user.id}`, payload);
+            await api.patch(`/users/me`, payload);
 
             setStatus({ type: 'success', message: 'Profile updated successfully!' });
 
-            //Clear success message after 3 seconds
+            // Clear success message after 3 seconds
             setTimeout(() => setStatus({ type: '', message: ''}), 3000);
-        }catch (err) {
+        } catch (err) {
             setStatus({ type: 'error', message: err.response?.data?.message || 'Failed to update profile. Please try again.' });
         }
     };
@@ -71,16 +72,23 @@ const Profile = () => {
             
             <div className="max-w-3xl mx-auto px-4 py-12">
                 <div className="bg-white p-10 shadow-xl border border-gray-100 rounded-2xl">
-                    <div className="mb-8 border-b border-gray-100 pb-6">
-                        <h1 className="text-3xl font-black uppercase italic tracking-tighter text-black">
-                            Profile Settings
-                        </h1>
-                        <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mt-2">
-                            Manage your account details and preferences
-                        </p>
+                    <div className="mb-8 border-b border-gray-100 pb-6 flex justify-between items-end">
+                        <div>
+                            <h1 className="text-3xl font-black uppercase italic tracking-tighter text-black">
+                                Profile Settings
+                            </h1>
+                            <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mt-2">
+                                Manage your account details and preferences
+                            </p>
+                        </div>
+                        {/* Show a preview of the avatar if they have one */}
+                        {formData.profile_image_url && (
+                            <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-gray-100 shadow-sm">
+                                <img src={formData.profile_image_url} alt="Profile Preview" className="w-full h-full object-cover" />
+                            </div>
+                        )}
                     </div>
 
-                    {/* Status Messages */}
                     {status.message && (
                         <div className={`p-4 mb-6 text-sm font-bold uppercase tracking-widest border-l-4 ${
                             status.type === 'success' ? 'bg-green-50 text-green-700 border-green-500' : 
@@ -93,7 +101,6 @@ const Profile = () => {
 
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {/* Full Name */}
                             <div className="space-y-2">
                                 <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Full Name</label>
                                 <input
@@ -104,20 +111,30 @@ const Profile = () => {
                                 />
                             </div>
 
-                            {/* Email Address */}
                             <div className="space-y-2">
                                 <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Email Address</label>
                                 <input
                                     type="email" required
                                     className="w-full border-2 border-gray-100 p-3 focus:border-black outline-none font-bold text-sm transition-all bg-gray-50"
                                     value={formData.email}
-                                    readOnly // Email is read-only to prevent changes, as it is often used as a unique identifier
+                                    readOnly 
                                     onChange={(e) => setFormData({...formData, email: e.target.value})}
                                 />
                             </div>
                         </div>
 
-                        {/* Shipping Address*/}
+                        {/* 3. New Profile Image Input Block */}
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Profile Image URL</label>
+                            <input
+                                type="text"
+                                placeholder="https://example.com/my-avatar.jpg"
+                                className="w-full border-2 border-gray-100 p-3 focus:border-black outline-none font-medium text-xs text-gray-500 transition-all"
+                                value={formData.profile_image_url}
+                                onChange={(e) => setFormData({...formData, profile_image_url: e.target.value})}
+                            />
+                        </div>
+
                         <div className="space-y-2">
                             <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Default Shipping Address</label>
                             <input
@@ -129,7 +146,6 @@ const Profile = () => {
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {/* Payment Preferences */}
                             <div className="space-y-2">
                                 <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Payment Preference</label>
                                 <select 
@@ -143,7 +159,6 @@ const Profile = () => {
                                 </select>
                             </div>
 
-                            {/* Password Update */}
                             <div className="space-y-2">
                                 <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">New Password (Leave blank to keep current)</label>
                                 <input

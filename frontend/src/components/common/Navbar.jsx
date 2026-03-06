@@ -82,7 +82,7 @@ const Navbar = ({ onSearch }) => {
                                 className="w-10 h-10 rounded-full overflow-hidden cursor-pointer border-2 border-transparent hover:border-black transition-all"
                                 onClick={() => setIsProfileOpen(!isProfileOpen)}
                             >
-                                <img src={user.avatar || "https://i.pravatar.cc/150?img=11"} alt="Profile" className="w-full h-full object-cover" />
+                                <img src={user.profile_image_url || "https://i.pravatar.cc/150?img=11"} alt="Profile" className="w-full h-full object-cover" />
                             </div>
 
                             {/* Profile Dropdown Menu */}
