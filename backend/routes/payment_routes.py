@@ -9,6 +9,8 @@ from interigations.stripe_client import StripeClient
 
 router : APIRouter = APIRouter( prefix="/payments", tags=["payments"])
 
+stripe_client : StripeClient = StripeClient()
+
 @router.post("/{order_id}",status_code=201)
 def create_payment(order_id : int, payment_method : PaymentRequest, session : Session = Depends(get_session), current_user : TokenData = Depends(get_current_user)):
     """Create payment for order"""
@@ -26,7 +28,7 @@ def create_payment(order_id : int, payment_method : PaymentRequest, session : Se
             session.refresh(payment)
             return payment
         case PAYMENT_METHOD.STRIPE:
-            stripe_client : StripeClient = StripeClient()
+            
             payment : Payment = Payment(order_id=order_id, amount=order.total_price, method=payment_method.payment_type, status=PAYMENT_STATUS.PENDING)
             # client_secret, payment_intent_id = stripe_client.create_payment_intent(order.total_price, payment, session)
             stripe_response = stripe_client.create_payment_intent(order.total_price, payment, session)
@@ -38,5 +40,11 @@ def create_payment(order_id : int, payment_method : PaymentRequest, session : Se
             session.commit()
             session.refresh(payment)
             return stripe_secrets
+        
+    @router.post("/webhook")
+    def stripe_webhook(payload: bytes, stripe_signature: str, session: Session = Depends(get_session)):
+        """Stripe webhook endpoint to handle payment events"""
+        status : dict = stripe_client.verify_payment(payload, stripe_signature,session)
+        return status
 
     
