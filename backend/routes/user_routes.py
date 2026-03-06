@@ -17,6 +17,14 @@ def get_users(session: Session = Depends(get_session),  cur_user : TokenData = D
     users = session.exec(select(User)).all()
     return users
 
+@router.get("/me", response_model=UserRead)
+def get_current_user_info(session: Session = Depends(get_session), current_user: TokenData = Depends(get_current_user)):
+    """Get the current user's information"""
+    user = session.get(User, current_user.user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
+
 @router.post("/", response_model=UserRead, status_code=201)
 def register(user : UserCreate, session: Session = Depends(get_session)):
     """Register a new user"""
