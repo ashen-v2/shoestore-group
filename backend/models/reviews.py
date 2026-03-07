@@ -22,9 +22,9 @@ class ReviewRead(SQLModel):
     rating : int
     description : str | None
     created_at : datetime
+    is_reviewed : bool
 
 class ReviewUpdate(SQLModel):
-    id : int
-    rating : int
+    rating : int | None = 5
     description : str | None = Field(default=None, nullable=True, max_length=300)
     created_at : datetime = Field(default_factory=lambda : datetime.now(timezone.utc), nullable=False)

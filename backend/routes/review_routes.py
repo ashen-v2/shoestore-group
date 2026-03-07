@@ -23,3 +23,23 @@ def get_user_reviews(session : Session = Depends(get_session),current_user : Tok
     """Get reviews by the current user"""
     user_reviews : list[Review] = session.exec(select(Review).where(Review.user_id == current_user.user_id)).all()
     return user_reviews
+
+@router.patch("/{review_id}", response_model=ReviewRead)
+def update_review(review_id : int, review_update : ReviewUpdate, session : Session = Depends(get_session), current_user : TokenData = Depends(get_current_user)):
+    """Update a review"""
+    review : Review = session.get(Review, review_id)
+    if not review:
+        raise HTTPException(status_code=404, detail="Review not found")
+    if review.user_id != current_user.user_id:
+        raise HTTPException(status_code=403, detail="Not authorized to update this review")
+    if review.is_reviewed:
+        raise HTTPException(status_code=400, detail="Cannot update a review that has already been submitted")
+    
+    review_data = review_update.model_dump(exclude_unset=True)
+    for key, value in review_data.items():
+        setattr(review, key, value)
+    review.is_reviewed = True
+    session.add(review)
+    session.commit()
+    session.refresh(review)
+    return review
