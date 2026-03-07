@@ -37,3 +37,13 @@ def create_product(product: ProductCreate, session=Depends(get_session)):
         return db_product
     except Exception as e:
         raise HTTPException(status_code=400, detail="Product creation failed")
+
+@router.delete("/products/{product_id}", status_code=204) #previously DELETE/products/{product_id}
+def delete_product(product_id: int, session : Session = Depends(get_session)):
+    """Delete a product by ID"""
+    product = session.get(Product,product_id)
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    session.delete(product)
+    session.commit()
+    return

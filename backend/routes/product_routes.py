@@ -35,16 +35,6 @@ def get_product(product_id: int, session: Session = Depends(get_session)):
         raise HTTPException(status_code=404, detail="Product not found")
     return product
 
-@router.delete("/{product_id}", status_code=204)
-def delete_product(product_id: int, session : Session = Depends(get_session), current_user : TokenData = Depends(allow_admin)):
-    """Delete a product by ID"""
-    product = session.get(Product,product_id)
-    if not product:
-        raise HTTPException(status_code=404, detail="Product not found")
-    session.delete(product)
-    session.commit()
-    return
-
 @router.patch("/{product_id}", response_model=Product, status_code=200)
 def update_product(product_id: int, product: ProductUpdate, session: Session = Depends(get_session), current_user : TokenData = Depends(allow_admin_moderator)):
     """Update a product by ID"""
