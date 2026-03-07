@@ -29,3 +29,7 @@ class PaymentRequest(SQLModel):
 class StripeSecrets(SQLModel):
     client_secret: str
     payment_intent_id: str
+
+class PaymentUpdate(SQLModel):
+    status : PAYMENT_STATUS | None = None
+    transaction_id : str | None = None

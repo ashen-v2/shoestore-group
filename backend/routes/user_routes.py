@@ -11,11 +11,6 @@ from utils import DUMMY_HASH
 
 router : APIRouter = APIRouter( prefix="/users", tags=["users"])
 
-@router.get("/", response_model=list[User] )
-def get_users(session: Session = Depends(get_session),  cur_user : TokenData = Depends(allow_admin) ):
-    """Get all users"""
-    users = session.exec(select(User)).all()
-    return users
 
 @router.get("/me", response_model=UserRead)
 def get_current_user_info(session: Session = Depends(get_session), current_user: TokenData = Depends(get_current_user)):

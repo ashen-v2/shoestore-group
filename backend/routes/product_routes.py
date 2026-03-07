@@ -26,18 +26,6 @@ def get_products(session : Session = Depends(get_session),
     products = session.exec(select(Product).offset(skip).limit(limit)).all()
     return products
 
-
-@router.post("/", response_model=Product, status_code=201)
-def create_product(product: ProductCreate, session=Depends(get_session), current_user : TokenData = Depends(allow_admin)):
-    """Create a new product"""
-    try:
-        db_product = Product.model_validate(product)
-        session.add(db_product)
-        session.commit()
-        session.refresh(db_product)
-        return db_product
-    except Exception as e:
-        raise HTTPException(status_code=400, detail="Product creation failed")
     
 @router.get("/{product_id}", response_model=Product)
 def get_product(product_id: int, session: Session = Depends(get_session)):
@@ -46,28 +34,3 @@ def get_product(product_id: int, session: Session = Depends(get_session)):
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
     return product
-
-@router.delete("/{product_id}", status_code=204)
-def delete_product(product_id: int, session : Session = Depends(get_session), current_user : TokenData = Depends(allow_admin)):
-    """Delete a product by ID"""
-    product = session.get(Product,product_id)
-    if not product:
-        raise HTTPException(status_code=404, detail="Product not found")
-    session.delete(product)
-    session.commit()
-    return
-
-@router.patch("/{product_id}", response_model=Product, status_code=200)
-def update_product(product_id: int, product: ProductUpdate, session: Session = Depends(get_session), current_user : TokenData = Depends(allow_admin_moderator)):
-    """Update a product by ID"""
-    db_product = session.get(Product, product_id)
-    if not db_product:
-        raise HTTPException(status_code=404, detail="Product not found")
-    
-    updated_product = product.model_dump(exclude_unset=True)
-    for key, value in updated_product.items():
-        setattr(db_product, key, value)
-    session.add(db_product)
-    session.commit()
-    session.refresh(db_product)
-    return db_product
