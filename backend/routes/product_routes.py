@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlmodel import Session, select
 from db.session import get_session
-from models.products import Product, ProductCreate, ProductUpdate
+from models.products import Product
 from models.tokens import TokenData
 from dependancies.dependancies import get_current_user, allow_admin, allow_admin_moderator
 
