@@ -65,4 +65,10 @@ class wishlist(SQLModel, table=True):
     user_id : int = Field(foreign_key="user.id", nullable=False, ondelete="CASCADE")
     product_id : int = Field(foreign_key="product.id", nullable=False, ondelete="CASCADE")
     created_at : datetime = Field(default_factory=lambda : datetime.now(timezone.utc), nullable=False)
+
+class wishlistRead(SQLModel):
+    id : int
+    user_id : int
+    product_id : int
+    created_at : datetime
     
