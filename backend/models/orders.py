@@ -46,6 +46,10 @@ class Order(SQLModel, table=True):
     payment_status : str = Field(default=PAYMENT_STATUS.PENDING, nullable=False)
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc), nullable=False)
 
+class OrderUpdate(SQLModel):
+    delivery_status : DELIVERY_STATUS | None = None
+    payment_status : PAYMENT_STATUS | None = None
+
 
 class OrderCreate(SQLModel):
     user_id : int
