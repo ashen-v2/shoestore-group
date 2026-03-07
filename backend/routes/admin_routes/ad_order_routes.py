@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlmodel import Session, select
 from db.session import get_session
 from models.orders import Order, OrderItem, OrderUpdate
+from utils.other_utils import ReviewTools
 
 router = APIRouter(prefix="/orders", tags=["admin"])
 
@@ -31,6 +32,11 @@ def update_order(order_id: int, order_update: OrderUpdate, session: Session = De
         setattr(order, key, value)
     
     session.add(order)
+    session.flush()
+
+    reviewtools : ReviewTools = ReviewTools(order.id, order.user_id, session) # create instance of a class to create review templates
+    reviewtools.autoReviews()
+    
     session.commit()
     session.refresh(order)
     return order

@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
+from utils.other_utils import ReviewTools
 from models.payments import Payment, PaymentUpdate
 from models.orders import Order
 from db.session import get_session
@@ -28,10 +29,13 @@ def update_payment(payment_id: int, payment_update: PaymentUpdate, session: Sess
                 order.payment_status = value
                 session.add(order)
                 session.flush()
+                reviewtools : ReviewTools = ReviewTools(order.id, order.user_id, session) # create instance of a class to create review templates
+                reviewtools.autoReviews()
             except Exception as e:
                 session.rollback()
                 raise HTTPException(status_code=500, detail="Failed to update order payment status") from e
 
+    
     session.add(payment)
     session.commit()
     session.refresh(payment)

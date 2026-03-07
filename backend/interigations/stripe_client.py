@@ -3,6 +3,7 @@ import stripe
 from models.orders import Order
 from models.payments import Payment
 from sqlmodel import Session, select
+from utils.other_utils import ReviewTools
 
 stripe.api_key = settings.stripe_secret_key
 
@@ -52,6 +53,8 @@ class StripeClient:
             order = session.get(Order, payment.order_id)
             order.payment_status = "completed"
             session.add(order)
+            reviewtools : ReviewTools = ReviewTools(order.id, order.user_id, session) # create instance of a class to create review templates
+            reviewtools.autoReviews()
             session.commit()
             return {"message": "Payment verified and order updated"}
         else:
