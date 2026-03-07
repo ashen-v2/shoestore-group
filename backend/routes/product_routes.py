@@ -26,18 +26,6 @@ def get_products(session : Session = Depends(get_session),
     products = session.exec(select(Product).offset(skip).limit(limit)).all()
     return products
 
-
-@router.post("/", response_model=Product, status_code=201)
-def create_product(product: ProductCreate, session=Depends(get_session), current_user : TokenData = Depends(allow_admin)):
-    """Create a new product"""
-    try:
-        db_product = Product.model_validate(product)
-        session.add(db_product)
-        session.commit()
-        session.refresh(db_product)
-        return db_product
-    except Exception as e:
-        raise HTTPException(status_code=400, detail="Product creation failed")
     
 @router.get("/{product_id}", response_model=Product)
 def get_product(product_id: int, session: Session = Depends(get_session)):
