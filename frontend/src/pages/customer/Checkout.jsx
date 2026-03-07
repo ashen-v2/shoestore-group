@@ -5,7 +5,7 @@ import { useCart } from '../../context/CartContext';
 import api from '../../api/axiosConfig';
 import Navbar from '../../components/common/Navbar';
 
-const Checkout= () => {
+const Checkout = () => {
     const { user } = useAuth();
     const { cartItems, fetchCart } = useCart();
     const navigate = useNavigate();
@@ -27,23 +27,60 @@ const Checkout= () => {
             setError('Your cart is empty!');
             return;
         }
+
         setIsProcessing(true);
         setError('');
 
         try {
-            // Chosen payment method send to backend
-            const payload = {
-                payment_method: paymentMethod,
-                shipping_address: user.address, // user address
+            // Create the Order
+            const orderPayload = {
+                shipping_address: user.address
             };
-            await api.post('/orders/', payload);
-            await fetchCart(); // Refresh cart after placing order
-            navigate('/orders'); // Redirect to orders page
+            const orderResponse = await api.post('/orders/', orderPayload);
+            const newOrderId = orderResponse.data.id; // Extract the new Order ID
+
+            // Process the Payment using the new endpoint
+            const paymentPayload = {
+                payment_type: paymentMethod === 'COD' ? 'cash_on_delivery' : 'stripe'
+            };
+
+            // Call the new payment route!
+            const paymentResponse = await api.post(`/payments/${newOrderId}`, paymentPayload);
+
+            // Handle the Stripe Secret
+            if (paymentMethod === 'Stripe') {
+                const clientSecret = paymentResponse.data.client_secret;
+                // secret to open the Stripe UI in the next phase!
+                console.log("Stripe Client Secret received:", clientSecret);
+            }
+
+            // Clean up and Redirect (For COD, this happens instantly)
+            if (paymentMethod === 'COD') {
+                await fetchCart(); // Clear the cart
+                navigate('/orders'); // Send them to the success page
+            }
+
         } catch (err) {
-            setError(err.response?.data?.detail || 'Failed to place order. Please try again.');
+            console.error("Checkout Error:", err);
+
+            // Catch FastAPI's specific 422 Array format to prevent React crashes
+            if (err.response?.status === 422 && Array.isArray(err.response.data.detail)) {
+                const errorDetails = err.response.data.detail[0];
+                const fieldName = errorDetails.loc[errorDetails.loc.length - 1]; // Gets the field name
+                setError(`Backend Validation Error: The field '${fieldName}' ${errorDetails.msg}`);
+            } 
+            // Handle normal string errors
+            else {
+                setError(typeof err.response?.data?.detail === 'string' 
+                    ? err.response.data.detail 
+                    : 'Failed to process checkout. Please try again.');
+                    
+            setError(err.response?.data?.detail || 'Failed to process checkout. Please try again.');
             setIsProcessing(false);
         }
     };
+
+};
 
     if (cartItems.length === 0 && !isProcessing) {
         return (
@@ -59,7 +96,7 @@ const Checkout= () => {
     return (
         <div className="bg-gray-50 min-h-screen pb-20">
             <Navbar />
-            
+
             <div className="max-w-6xl mx-auto px-6 py-12">
                 <h1 className="text-4xl font-black uppercase italic tracking-tighter text-black mb-8">
                     Checkout
@@ -72,10 +109,10 @@ const Checkout= () => {
                 )}
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-                    
+
                     {/* Left: Shipping & Payment Details */}
                     <div className="lg:col-span-2 space-y-8">
-                        
+
                         {/* Shipping Address Section */}
                         <div className="bg-white p-8 border border-gray-100 shadow-sm">
                             <h2 className="text-xl font-black uppercase tracking-tight text-black mb-6">1. Delivery Address</h2>
@@ -90,14 +127,14 @@ const Checkout= () => {
                         {/* Payment Method Section */}
                         <div className="bg-white p-8 border border-gray-100 shadow-sm">
                             <h2 className="text-xl font-black uppercase tracking-tight text-black mb-6">2. Payment Method</h2>
-                            
+
                             <div className="space-y-4">
                                 {/* Stripe Option (Disabled for now) */}
                                 <label className={`flex items-center p-4 border-2 cursor-not-allowed opacity-50 bg-gray-50 border-gray-200`}>
-                                    <input 
-                                        type="radio" 
-                                        name="payment" 
-                                        value="Stripe" 
+                                    <input
+                                        type="radio"
+                                        name="payment"
+                                        value="Stripe"
                                         disabled
                                         className="w-4 h-4 text-black focus:ring-black accent-black"
                                     />
@@ -106,10 +143,10 @@ const Checkout= () => {
 
                                 {/* COD Option */}
                                 <label className={`flex items-center p-4 border-2 cursor-pointer transition-all ${paymentMethod === 'COD' ? 'border-black bg-white' : 'border-gray-200 bg-white hover:border-gray-300'}`}>
-                                    <input 
-                                        type="radio" 
-                                        name="payment" 
-                                        value="COD" 
+                                    <input
+                                        type="radio"
+                                        name="payment"
+                                        value="COD"
                                         checked={paymentMethod === 'COD'}
                                         onChange={(e) => setPaymentMethod(e.target.value)}
                                         className="w-4 h-4 text-black focus:ring-black accent-black"
@@ -124,7 +161,7 @@ const Checkout= () => {
                     <div className="lg:col-span-1">
                         <div className="bg-white p-8 border border-gray-100 shadow-sm sticky top-24">
                             <h2 className="text-xl font-black uppercase italic tracking-tighter text-black mb-6">In Your Bag</h2>
-                            
+
                             {/* Miniature Item List */}
                             <div className="space-y-4 mb-6 max-h-60 overflow-y-auto pr-2 border-b border-gray-100 pb-6">
                                 {cartItems.map(item => (
@@ -155,12 +192,11 @@ const Checkout= () => {
                                 <span className="text-2xl font-black italic text-black">${subtotal.toFixed(2)}</span>
                             </div>
 
-                            <button 
+                            <button
                                 onClick={handlePlaceOrder}
                                 disabled={isProcessing || !user?.address}
-                                className={`w-full py-5 font-black uppercase text-xs tracking-widest shadow-lg transition-all ${
-                                    isProcessing || !user?.address ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-black text-white hover:bg-gray-800 active:scale-95'
-                                }`}
+                                className={`w-full py-5 font-black uppercase text-xs tracking-widest shadow-lg transition-all ${isProcessing || !user?.address ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-black text-white hover:bg-gray-800 active:scale-95'
+                                    }`}
                             >
                                 {isProcessing ? 'Processing...' : 'Place Order'}
                             </button>
