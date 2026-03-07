@@ -122,7 +122,8 @@ export const CartProvider = ({ children }) => {
             cartCount, 
             addToCart, 
             updateQuantity, 
-            removeFromCart 
+            removeFromCart,
+            fetchCart
         }}>
             {children}
         </CartContext.Provider>

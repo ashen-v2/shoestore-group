@@ -1,13 +1,23 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
 const AdminSidebar = () => {
     const { logout } = useAuth();
     const navigate = useNavigate();
+    const location = useLocation(); // Gets the current URL path
 
     const handleLogout = () => {
         logout();
         navigate('/login');
+    };
+
+    // Helper function to check if a link is active
+    const isActive = (path) => {
+        // Exact match for dashboard, partial match for sub-routes
+        if (path === '/admin') {
+            return location.pathname === '/admin';
+        }
+        return location.pathname.startsWith(path);
     };
 
     return (
@@ -21,21 +31,36 @@ const AdminSidebar = () => {
 
             {/* Navigation Links */}
             <nav className="flex-1 space-y-4 font-bold uppercase text-xs tracking-widest">
-                <Link to="/admin" className="block p-3 bg-gray-900 rounded-md hover:bg-gray-800 transition-colors">
+                <Link 
+                    to="/admin" 
+                    className={`block p-3 rounded-md transition-colors ${isActive('/admin') ? 'bg-white text-black' : 'bg-transparent text-gray-300 hover:bg-gray-900'}`}
+                >
                     Dashboard
                 </Link>
-                <Link to="/admin/inventory" className="block p-3 hover:bg-gray-900 rounded-md transition-colors">
-                    Inventory
+                
+                <Link 
+                    to="/admin/orders" 
+                    className={`block p-3 rounded-md transition-colors ${isActive('/admin/orders') ? 'bg-white text-black' : 'bg-transparent text-gray-300 hover:bg-gray-900'}`}
+                >
+                    Orders
                 </Link>
-                <Link to="/admin/reports" className="block p-3 hover:bg-gray-900 rounded-md transition-colors">
+                
+                <Link 
+                    to="/admin/reports" 
+                    className={`block p-3 rounded-md transition-colors ${isActive('/admin/reports') ? 'bg-white text-black' : 'bg-transparent text-gray-300 hover:bg-gray-900'}`}
+                >
                     Sales Reports
                 </Link>
-                <Link to="/" className="block p-3 text-gray-400 hover:text-white transition-colors border-t border-gray-800 pt-6">
+                
+                <Link 
+                    to="/" 
+                    className="block p-3 text-gray-400 hover:text-white transition-colors border-t border-gray-800 pt-6 mt-4"
+                >
                     View Website
                 </Link>
             </nav>
 
-            {/* Logout*/}
+            {/* Logout */}
             <button 
                 onClick={handleLogout}
                 className="mt-auto p-3 text-left text-red-500 hover:bg-red-500 hover:text-white rounded-md transition-all font-bold uppercase text-[10px]"

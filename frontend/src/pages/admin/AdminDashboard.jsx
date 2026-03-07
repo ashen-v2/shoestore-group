@@ -9,9 +9,9 @@ const AdminDashboard = () => {
     const [currentProductId, setCurrentProductId] = useState(null);
 
     const [showStockModal, setShowStockModal] = useState(false);
-    const [selectedProductStock, setSelectedProductStock] = useState(null); //Holds the product whose stock is being edited
-    const [stockList, setStockList] = useState([]); //Holds the size and quantity pairs for the selected product
-    const [newStock, setNewStock] = useState({ size: '', quantity: 0 }); //For adding new stock entries in the modal
+    const [selectedProductStock, setSelectedProductStock] = useState(null); 
+    const [stockList, setStockList] = useState([]); 
+    const [newStock, setNewStock] = useState({ size: '', quantity: 0 }); 
 
     const [productForm, setProductForm] = useState({
         name: '', brand: '', category: 'uncategorized', price: 0, image_url: 'https://placehold.co/600x400'
@@ -39,7 +39,6 @@ const AdminDashboard = () => {
     const openStockModal = async (product) => {
         setSelectedProductStock(product);
         try {
-            // Hits the GET /sticks/{product_id} route
             const response = await api.get(`/stocks/${product.id}`);
             setStockList(response.data);
             setShowStockModal(true);
@@ -50,42 +49,37 @@ const AdminDashboard = () => {
 
     // Add new size/quantity pair to the stock list
     const handleAddStock = async (e) => {
-    e.preventDefault();
-    e.stopPropagation(); // Prevents triggering any accidental parent forms
+        e.preventDefault();
+        e.stopPropagation(); 
 
-    try {
-        // 1. Force the inputs into strict Numbers before sending to FastAPI
-        const payload = {
-            size: parseFloat(newStock.size),
-            quantity: parseInt(newStock.quantity, 10)
-        };
+        try {
+            const payload = {
+                size: parseFloat(newStock.size),
+                quantity: parseInt(newStock.quantity, 10)
+            };
 
-        // 2. Send to the backend
-        await api.post(`/stocks/${selectedProductStock.id}`, payload);
-        
-        // 3. Reset form and refresh list on success
-        setNewStock({ size: '', quantity: '' }); 
-        const response = await api.get(`/stocks/${selectedProductStock.id}`);
-        setStockList(response.data);
-        
-    } catch (err) {
-        // 4. Catch FastAPI's specific 422 Array format so it doesn't fail silently
-        if (err.response?.status === 422) {
-            const errorDetails = err.response.data.detail[0];
-            alert(`Backend Validation Error: The field '${errorDetails.loc[1]}' ${errorDetails.msg}`);
-            console.error("FastAPI Error:", err.response.data.detail);
-        } else {
-            alert(err.response?.data?.detail || "Failed to add stock. Check console.");
-            console.error("Stock Add Error:", err);
+            await api.post(`/stocks/${selectedProductStock.id}`, payload);
+            
+            setNewStock({ size: '', quantity: '' }); 
+            const response = await api.get(`/stocks/${selectedProductStock.id}`);
+            setStockList(response.data);
+            
+        } catch (err) {
+            if (err.response?.status === 422) {
+                const errorDetails = err.response.data.detail[0];
+                alert(`Backend Validation Error: The field '${errorDetails.loc[1]}' ${errorDetails.msg}`);
+                console.error("FastAPI Error:", err.response.data.detail);
+            } else {
+                alert(err.response?.data?.detail || "Failed to add stock. Check console.");
+                console.error("Stock Add Error:", err);
+            }
         }
-    }
-};
+    };
 
     // Delete a size pair from the stock list
     const handleDeleteStock = async (stockId) => {
         if (window.confirm("Remove this size?")) {
             try {
-                // Hits the DELETE /stocks/{stock_id} route
                 await api.delete(`/stocks/${stockId}`);
                 setStockList(stockList.filter(s => s.id !== stockId));
             } catch (err) {
@@ -214,7 +208,6 @@ const AdminDashboard = () => {
                                         <td className="p-5 text-gray-400 text-xs font-black uppercase tracking-widest">{product.category}</td>
                                         <td className="p-5 text-sm font-black italic text-black">${product.price}</td>
                                         <td className="p-5 text-right space-x-4">
-                                            {/* New Stock Button */}
                                             <button
                                                 onClick={() => openStockModal(product)}
                                                 className="text-green-600 font-black text-[10px] uppercase tracking-widest hover:underline"
@@ -248,7 +241,6 @@ const AdminDashboard = () => {
                             <button onClick={() => setShowStockModal(false)} className="text-gray-400 hover:text-black font-black text-xl">&times;</button>
                         </div>
 
-                        {/* Existing Stock List */}
                         <div className="mb-8 max-h-48 overflow-y-auto pr-2">
                             {stockList.length === 0 ? (
                                 <p className="text-sm text-gray-500 italic">No sizes added yet.</p>
@@ -281,7 +273,6 @@ const AdminDashboard = () => {
                             )}
                         </div>
 
-                        {/* Add New Stock Form */}
                         <form onSubmit={handleAddStock} className="bg-gray-50 p-4 rounded-xl border border-gray-100">
                             <h3 className="text-xs font-black uppercase tracking-widest mb-3 text-black">Add New Size</h3>
                             <div className="flex space-x-3">

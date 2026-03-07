@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
@@ -8,6 +7,7 @@ import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import Home from './pages/customer/Home';
 import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminOrders from './pages/admin/AdminOrders';
 import Cart from './pages/customer/Cart';
 import Profile from './pages/customer/Profile';
 import Orders from './pages/customer/Orders';
@@ -53,6 +53,15 @@ function App() {
                 <AdminDashboard />
               }
             /> 
+            <Route
+              path="/admin/orders"
+              element={
+                // <ProtectedRoute allowedRoles={['admin']}>
+                //   <AdminOrders />
+                // </ProtectedRoute>
+                <AdminOrders />
+              }
+            />
             </Routes>
           </div>
         </Router>
