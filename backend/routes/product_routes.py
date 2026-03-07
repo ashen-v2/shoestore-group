@@ -34,18 +34,3 @@ def get_product(product_id: int, session: Session = Depends(get_session)):
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
     return product
-
-@router.patch("/{product_id}", response_model=Product, status_code=200)
-def update_product(product_id: int, product: ProductUpdate, session: Session = Depends(get_session), current_user : TokenData = Depends(allow_admin_moderator)):
-    """Update a product by ID"""
-    db_product = session.get(Product, product_id)
-    if not db_product:
-        raise HTTPException(status_code=404, detail="Product not found")
-    
-    updated_product = product.model_dump(exclude_unset=True)
-    for key, value in updated_product.items():
-        setattr(db_product, key, value)
-    session.add(db_product)
-    session.commit()
-    session.refresh(db_product)
-    return db_product

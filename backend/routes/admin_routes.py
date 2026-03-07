@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
 from db.session import get_session
 from models.users import User
-from models.products import Product, ProductCreate
+from models.products import Product, ProductCreate, ProductUpdate
 from dependancies.dependancies import allow_admin
 from models.tokens import TokenData
 
@@ -47,3 +47,18 @@ def delete_product(product_id: int, session : Session = Depends(get_session)):
     session.delete(product)
     session.commit()
     return
+
+@router.patch("/products/{product_id}", response_model=Product, status_code=200) #previously PATCH/products/{product_id}
+def update_product(product_id: int, product: ProductUpdate, session: Session = Depends(get_session)):
+    """Update a product by ID"""
+    db_product = session.get(Product, product_id)
+    if not db_product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    
+    updated_product = product.model_dump(exclude_unset=True)
+    for key, value in updated_product.items():
+        setattr(db_product, key, value)
+    session.add(db_product)
+    session.commit()
+    session.refresh(db_product)
+    return db_product
