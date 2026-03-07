@@ -25,3 +25,7 @@ class Payment(SQLModel, table=True):
 
 class PaymentRequest(SQLModel):
     payment_type : PAYMENT_METHOD
+
+class StripeSecrets(SQLModel):
+    client_secret: str
+    payment_intent_id: str
