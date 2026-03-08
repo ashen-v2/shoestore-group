@@ -53,6 +53,7 @@ class StripeClient:
             order = session.get(Order, payment.order_id)
             order.payment_status = "completed"
             session.add(order)
+            session.flush()
             reviewtools : ReviewTools = ReviewTools(order.id, order.user_id, session) # create instance of a class to create review templates
             reviewtools.autoReviews()
             session.commit()

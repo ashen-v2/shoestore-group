@@ -8,6 +8,7 @@ from config import settings
 from sqlmodel import SQLModel
 from models import * 
 from models.payments import Payment
+from models.products import wishlist
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
