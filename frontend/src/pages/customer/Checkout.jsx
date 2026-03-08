@@ -1,4 +1,7 @@
 import { useState } from 'react';
+import { Elements } from '@stripe/react-stripe-js';
+import { stripePromise } from '../../api/stripeConfig';
+import StripePaymentForm from './StripePaymentForm';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
@@ -13,6 +16,8 @@ const Checkout = () => {
     const [paymentMethod, setPaymentMethod] = useState('COD'); // Default to Cash on Delivery
     const [isProcessing, setIsProcessing] = useState(false);
     const [error, setError] = useState('');
+
+    const [clientSecret, setClientSecret] = useState(''); // For stripe payments
 
     // Calculate the subtotal amount for the order
     const subtotal = cartItems.reduce((total, item) => {
@@ -50,6 +55,7 @@ const Checkout = () => {
             // Handle the Stripe Secret
             if (paymentMethod === 'Stripe') {
                 const clientSecret = paymentResponse.data.client_secret;
+                setClientSecret(paymentResponse.data.client_secret);
                 // secret to open the Stripe UI in the next phase!
                 console.log("Stripe Client Secret received:", clientSecret);
             }
@@ -68,19 +74,19 @@ const Checkout = () => {
                 const errorDetails = err.response.data.detail[0];
                 const fieldName = errorDetails.loc[errorDetails.loc.length - 1]; // Gets the field name
                 setError(`Backend Validation Error: The field '${fieldName}' ${errorDetails.msg}`);
-            } 
+            }
             // Handle normal string errors
             else {
-                setError(typeof err.response?.data?.detail === 'string' 
-                    ? err.response.data.detail 
+                setError(typeof err.response?.data?.detail === 'string'
+                    ? err.response.data.detail
                     : 'Failed to process checkout. Please try again.');
-                    
-            setError(err.response?.data?.detail || 'Failed to process checkout. Please try again.');
-            setIsProcessing(false);
-        }
-    };
 
-};
+                setError(err.response?.data?.detail || 'Failed to process checkout. Please try again.');
+                setIsProcessing(false);
+            }
+        };
+
+    };
 
     if (cartItems.length === 0 && !isProcessing) {
         return (
@@ -88,6 +94,19 @@ const Checkout = () => {
                 <Navbar />
                 <div className="flex items-center justify-center h-[60vh] font-black uppercase tracking-widest text-gray-400">
                     Your cart is empty.
+                </div>
+            </div>
+        );
+    }
+
+    if (clientSecret) {
+        return (
+            <div className="bg-gray-50 min-h-screen pb-20">
+                <Navbar />
+                <div className="max-w-xl mx-auto px-6 py-12">
+                    <Elements stripe={stripePromise} options={{ clientSecret }}>
+                        <StripePaymentForm />
+                    </Elements>
                 </div>
             </div>
         );
@@ -129,16 +148,17 @@ const Checkout = () => {
                             <h2 className="text-xl font-black uppercase tracking-tight text-black mb-6">2. Payment Method</h2>
 
                             <div className="space-y-4">
-                                {/* Stripe Option (Disabled for now) */}
-                                <label className={`flex items-center p-4 border-2 cursor-not-allowed opacity-50 bg-gray-50 border-gray-200`}>
+                                {/* Stripe Option */}
+                                <label className={`flex items-center p-4 border-2 cursor-pointer transition-all ${paymentMethod === 'Stripe' ? 'border-black bg-white' : 'border-gray-200 bg-white hover:border-gray-300'}`}>
                                     <input
                                         type="radio"
                                         name="payment"
                                         value="Stripe"
-                                        disabled
+                                        checked={paymentMethod === 'Stripe'}
+                                        onChange={(e) => setPaymentMethod(e.target.value)}
                                         className="w-4 h-4 text-black focus:ring-black accent-black"
                                     />
-                                    <span className="ml-3 font-bold text-sm uppercase tracking-widest">Credit/Debit Card (Stripe - Coming Soon)</span>
+                                    <span className="ml-3 font-bold text-sm uppercase tracking-widest">Credit/Debit Card (Stripe)</span>
                                 </label>
 
                                 {/* COD Option */}

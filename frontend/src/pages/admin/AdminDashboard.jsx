@@ -111,9 +111,9 @@ const AdminDashboard = () => {
         e.preventDefault();
         try {
             if (isEditing) {
-                await api.patch(`/products/${currentProductId}`, productForm);
+                await api.patch(`/admin/products/${currentProductId}`, productForm);
             } else {
-                await api.post('/products/', productForm);
+                await api.post('/admin/products/', productForm);
             }
             setShowModal(false);
             fetchInventory();
@@ -124,7 +124,7 @@ const AdminDashboard = () => {
 
     const handleDelete = async (id) => {
         if (window.confirm("Delete this shoe?")) {
-            await api.delete(`/products/${id}`);
+            await api.delete(`/admin/products/${id}`);
             fetchInventory();
         }
     };

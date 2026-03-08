@@ -44,6 +44,13 @@ const AdminSidebar = () => {
                 >
                     Orders
                 </Link>
+
+                <Link 
+                    to="/admin/payments" 
+                    className={`block p-3 rounded-md transition-colors ${isActive('/admin/payments') ? 'bg-white text-black' : 'bg-transparent text-gray-300 hover:bg-gray-900'}`}
+                >
+                    Payments
+                </Link>
                 
                 <Link 
                     to="/admin/reports" 

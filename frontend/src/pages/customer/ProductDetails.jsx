@@ -3,17 +3,22 @@ import { useParams } from 'react-router-dom';
 import api from '../../api/axiosConfig';
 import { useCart } from '../../context/CartContext';
 import Navbar from '../../components/common/Navbar';
+import { useWishlist } from '../../context/WishlistContext';
 
 const ProductDetails = () => {
     const { id } = useParams();
     const { addToCart } = useCart();
 
+    
+
     const [product, setProduct] = useState(null);
     const [stock, setStock] = useState([]);
     const [selectedStockId, setSelectedStockId] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [isFavorite, setIsFavorite] = useState(false);
+    // const [isFavorite, setIsFavorite] = useState(false);
     const [selectedImage, setSelectedImage] = useState(null);
+
+    
 
     useEffect(() => {
         const fetchProductAndStock = async () => {
@@ -49,12 +54,23 @@ const ProductDetails = () => {
         addToCart(selectedStockId);
     };
 
-    const toggleFavorite = () => {
-        setIsFavorite(!isFavorite);
-    };
 
     if (loading) return <div className="min-h-screen flex items-center justify-center font-black uppercase tracking-widest">Loading...</div>;
     if (!product) return <div className="min-h-screen flex items-center justify-center font-black uppercase tracking-widest">Product Not Found</div>;
+
+    const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+     // 2. Check if this specific shoe is already favorited
+    const isFavorite = isInWishlist(product.id);
+
+    const handleWishlistToggle = (e) => {
+        e.preventDefault(); // Prevents the user from being redirected to the product details page when clicking the heart
+        
+        if (isFavorite) {
+            removeFromWishlist(product.id);
+        } else {
+            addToWishlist(product.id);
+        }
+    };
 
 
     return (
@@ -125,7 +141,7 @@ const ProductDetails = () => {
                             </button>
 
                             <button
-                                onClick={toggleFavorite}
+                                onClick={handleWishlistToggle}
                                 className="w-full py-4 rounded-full font-medium text-base transition-all active:scale-[0.98] border border-gray-300 hover:border-black flex items-center justify-center gap-2 text-black bg-white"
                             >
                                 Favorite
