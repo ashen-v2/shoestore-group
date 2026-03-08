@@ -7,7 +7,7 @@ from models.orders import Order
 from models.tokens import TokenData
 from datetime import datetime, timezone
 
-router : APIRouter = APIRouter( prefix="/issuetickets", tags=["issuetickets"])
+router : APIRouter = APIRouter( prefix="/issuetickets", tags=["issue tickets"])
 
 @router.get("/", response_model=list[IssueTicket], status_code=200)
 def get_issue_tickets(session : Session = Depends(get_session),
@@ -51,4 +51,14 @@ def update_issue_ticket(ticket_id : int, status : IssueTicketStatusUpdate, sessi
     session.commit()
     session.refresh(issue_ticket)
     return issue_ticket
+
+@router.delete("/mod/{ticket_id}", status_code=204, tags=["moderator"], dependencies=[Depends(allow_admin_moderator)])
+def delete_issue_ticket(ticket_id : int, session : Session = Depends(get_session)):
+    """Delete an issue ticket (Admin/Moderator only)"""
+    issue_ticket : IssueTicket = session.get(IssueTicket, ticket_id)
+    if not issue_ticket:
+        raise HTTPException(status_code=404, detail="Issue Ticket not found")
+    
+    session.delete(issue_ticket)
+    session.commit()
 
