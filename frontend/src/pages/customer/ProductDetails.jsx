@@ -4,6 +4,7 @@ import api from '../../api/axiosConfig';
 import { useCart } from '../../context/CartContext';
 import Navbar from '../../components/common/Navbar';
 import { useWishlist } from '../../context/WishlistContext';
+import ProductReviews from '../../components/products/ProductReviews';
 
 const ProductDetails = () => {
     const { id } = useParams();
@@ -17,8 +18,6 @@ const ProductDetails = () => {
     const [loading, setLoading] = useState(true);
     // const [isFavorite, setIsFavorite] = useState(false);
     const [selectedImage, setSelectedImage] = useState(null);
-
-    
 
     useEffect(() => {
         const fetchProductAndStock = async () => {
@@ -161,7 +160,7 @@ const ProductDetails = () => {
                         </div>
 
                         {/* Accordions */}
-                        <div className="border-t border-gray-200 divide-y divide-gray-200">
+                        <div className="border-t border-gray-200">
 
                             {/* Free Delivery and Returns */}
                             <details className="group py-6 [&_summary::-webkit-details-marker]:hidden">
@@ -182,32 +181,9 @@ const ProductDetails = () => {
                             </details>
 
                             {/* Reviews */}
-                            <details className="group py-6 [&_summary::-webkit-details-marker]:hidden">
-                                <summary className="flex justify-between items-center font-bold text-lg text-black cursor-pointer list-none">
-                                    Reviews (42)
-                                    <div className="flex items-center gap-2">
-                                        <div className="flex text-black">
-                                            {[1, 2, 3, 4].map(star => (
-                                                <svg key={star} className="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
-                                            ))}
-                                            <svg className="w-4 h-4 fill-gray-300" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
-                                        </div>
-                                        <span className="transition duration-300 group-open:-rotate-180 ml-2">
-                                            <svg fill="none" height="24" shapeRendering="geometricPrecision" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
-                                        </span>
-                                    </div>
-                                </summary>
-                                <div className="mt-4 text-gray-600 text-sm">
-                                    <div className="mb-4">
-                                        <h4 className="font-bold text-black">Perfect everyday shoe</h4>
-                                        <p className="mt-1">"Super comfortable and fits true to size. I wear these every day to class." - John D.</p>
-                                    </div>
-                                    <div>
-                                        <h4 className="font-bold text-black">Classic Style</h4>
-                                        <p className="mt-1">"You can't go wrong with these. The materials feel premium." - Sarah M.</p>
-                                    </div>
-                                </div>
-                            </details>
+                            <div className="py-2">
+                                <ProductReviews productId={id} />
+                            </div>
 
                         </div>
                     </div>

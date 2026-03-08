@@ -18,6 +18,7 @@ import AdminPayments from './pages/admin/AdminPayments';
 import AdminAnalytics from './pages/admin/AdminAnalytics';
 import Wishlist from './pages/customer/Wishlist';
 import Category from './pages/customer/Category';
+import MyReviews from './pages/customer/MyReviews';
 
 // Role-Based Guard Component
 const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -50,6 +51,7 @@ function App() {
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/wishlist" element={<Wishlist />} />
             <Route path="/category" element={<Category />} />
+            <Route path="/my-reviews" element={<MyReviews />} />
 
             {/* Admin Routes*/}
              <Route

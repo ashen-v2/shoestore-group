@@ -14,7 +14,7 @@ const AdminAnalytics = () => {
         setLoading(true);
         try {
             // Hitting the endpoint your friend will make
-            const response = await api.get(`/admin/analytics/chart?period=${selectedPeriod}`);
+            const response = await api.get(`/admin/analytics/sales-total/${selectedPeriod}`);
             setChartData(response.data);
         } catch (err) {
             console.error("Failed to fetch chart data", err);
@@ -34,30 +34,30 @@ const AdminAnalytics = () => {
         fetchChartData(period);
     }, [period]);
 
-    // 2. Handle the CSV Report Download
-    const handleDownloadReport = async () => {
-        setDownloading(true);
-        try {
-            // Hitting the report endpoint. We use responseType 'blob' to handle the file download.
-            const response = await api.get('/admin/analytics/report?format=csv', {
-                responseType: 'blob', 
-            });
+    // // 2. Handle the CSV Report Download
+    // const handleDownloadReport = async () => {
+    //     setDownloading(true);
+    //     try {
+    //         // Hitting the report endpoint. We use responseType 'blob' to handle the file download.
+    //         const response = await api.get('/admin/analytics/report?format=csv', {
+    //             responseType: 'blob', 
+    //         });
             
-            // Create a fake link to force the browser to download the file
-            const url = window.URL.createObjectURL(new Blob([response.data]));
-            const link = document.createElement('a');
-            link.href = url;
-            link.setAttribute('download', `sales_report_${new Date().toISOString().split('T')[0]}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
-        } catch (err) {
-            console.error("Failed to download report", err);
-            alert("Report generation failed. Is the backend endpoint ready?");
-        } finally {
-            setDownloading(false);
-        }
-    };
+    //         // Create a fake link to force the browser to download the file
+    //         const url = window.URL.createObjectURL(new Blob([response.data]));
+    //         const link = document.createElement('a');
+    //         link.href = url;
+    //         link.setAttribute('download', `sales_report_${new Date().toISOString().split('T')[0]}.csv`);
+    //         document.body.appendChild(link);
+    //         link.click();
+    //         link.remove();
+    //     } catch (err) {
+    //         console.error("Failed to download report", err);
+    //         alert("Report generation failed. Is the backend endpoint ready?");
+    //     } finally {
+    //         setDownloading(false);
+    //     }
+    // };
 
     return (
         <div className="flex min-h-screen bg-gray-50">
@@ -73,7 +73,7 @@ const AdminAnalytics = () => {
                         
                         {/* Download Report Button */}
                         <button 
-                            onClick={handleDownloadReport}
+                            // onClick={handleDownloadReport}
                             disabled={downloading}
                             className={`px-6 py-3 font-black uppercase text-[10px] tracking-widest shadow-lg transition-all flex items-center gap-2 ${
                                 downloading ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-black text-white hover:bg-gray-800 active:scale-95'
@@ -100,7 +100,6 @@ const AdminAnalytics = () => {
                                 onChange={(e) => setPeriod(e.target.value)}
                                 className="p-2 border-2 border-gray-200 text-xs font-bold uppercase tracking-widest outline-none focus:border-black transition-colors"
                             >
-                                <option value="daily">Daily</option>
                                 <option value="weekly">Weekly</option>
                                 <option value="monthly">Monthly</option>
                             </select>

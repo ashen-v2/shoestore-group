@@ -53,8 +53,8 @@ const AdminSidebar = () => {
                 </Link>
                 
                 <Link 
-                    to="/admin/reports" 
-                    className={`block p-3 rounded-md transition-colors ${isActive('/admin/reports') ? 'bg-white text-black' : 'bg-transparent text-gray-300 hover:bg-gray-900'}`}
+                    to="/admin/analytics" 
+                    className={`block p-3 rounded-md transition-colors ${isActive('/admin/analytics') ? 'bg-white text-black' : 'bg-transparent text-gray-300 hover:bg-gray-900'}`}
                 >
                     Sales Reports
                 </Link>
