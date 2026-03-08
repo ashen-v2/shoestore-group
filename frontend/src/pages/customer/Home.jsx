@@ -174,9 +174,9 @@ const Home = () => {
                     <div>
                         <h3 className="font-bold text-black mb-6 text-[15px]">Categories</h3>
                         <ul className="space-y-4 text-[14px] text-gray-500 font-semibold font-sans">
-                            <li><a href="#" className="hover:text-black transition-colors">Air Force</a></li>
-                            <li><a href="#" className="hover:text-black transition-colors">Air Jordan</a></li>
-                            <li><a href="#" className="hover:text-black transition-colors">Pegasus</a></li>
+                            <li><a href="/category" className="hover:text-black transition-colors">Air Force</a></li>
+                            <li><a href="/category" className="hover:text-black transition-colors">Air Jordan</a></li>
+                            <li><a href="/category" className="hover:text-black transition-colors">Pegasus</a></li>
                         </ul>
                     </div>
 
@@ -193,7 +193,7 @@ const Home = () => {
                     <div>
                         <h3 className="font-bold text-black mb-6 text-[15px]">Quick Links</h3>
                         <ul className="space-y-4 text-[14px] text-gray-500 font-semibold font-sans">
-                            <li><a href="#" className="hover:text-black transition-colors">Search</a></li>
+                            <li><a href="/search" className="hover:text-black transition-colors">Search</a></li>
                             <li><a href="#" className="hover:text-black transition-colors">Privacy Policy</a></li>
                             <li><a href="#" className="hover:text-black transition-colors">Return Policy</a></li>
                             <li><a href="#" className="hover:text-black transition-colors">Terms of Service</a></li>
