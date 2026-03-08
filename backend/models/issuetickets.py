@@ -27,3 +27,6 @@ class IssueTicket(SQLModel, table=True):
 class IssueTicketCreate(SQLModel):
     subject : SUBJECTS
     description : str
+
+class IssueTicketStatusUpdate(SQLModel):
+    status : TICKET_STATUS

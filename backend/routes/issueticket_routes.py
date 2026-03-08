@@ -1,10 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
-from dependancies.dependancies import get_current_user
+from dependancies.dependancies import get_current_user, allow_admin_moderator
 from db.session import get_session
-from models.issuetickets import IssueTicket, IssueTicketCreate
+from models.issuetickets import IssueTicket, IssueTicketCreate, IssueTicketStatusUpdate
 from models.orders import Order
 from models.tokens import TokenData
+from datetime import datetime, timezone
 
 router : APIRouter = APIRouter( prefix="/issuetickets", tags=["issuetickets"])
 
@@ -30,3 +31,24 @@ def create_issue_ticket(order_id : int, issueticket: IssueTicketCreate, session 
     session.commit()
     session.refresh(issue_ticket)
     return issue_ticket
+
+@router.get("/mod", response_model=list[IssueTicket], status_code=200, dependencies=[Depends(allow_admin_moderator)], tags=["moderator"])
+def get_all_issue_tickets(session : Session = Depends(get_session), limit : int = 50, offset : int = 0):
+    """Get all issue tickets (Admin/Moderator only)"""
+    issue_tickets : list[IssueTicket] = session.exec(select(IssueTicket).offset(offset).limit(limit).order_by(IssueTicket.created_at.desc())).all()
+    return issue_tickets
+
+@router.patch("/mod/{ticket_id}", response_model=IssueTicket, tags=["moderator"])
+def update_issue_ticket(ticket_id : int, status : IssueTicketStatusUpdate, session : Session = Depends(get_session), current_user : TokenData = Depends(allow_admin_moderator)):
+    """Update the status of an issue ticket (Admin/Moderator only)"""
+    issue_ticket : IssueTicket = session.get(IssueTicket, ticket_id)
+    if not issue_ticket:
+        raise HTTPException(status_code=404, detail="Issue Ticket not found")
+    
+    issue_ticket.status = status.status
+    issue_ticket.updated_at = datetime.now(timezone.utc)
+    session.add(issue_ticket)
+    session.commit()
+    session.refresh(issue_ticket)
+    return issue_ticket
+
