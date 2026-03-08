@@ -49,7 +49,6 @@ const ProductReviews = ({ productId }) => {
             </h2>
 
             {/* Placeholder for the future "Add Review" form */}
-            {/* We will add the form here once we have the POST endpoint! */}
 
             <div className="space-y-8">
                 {reviews.length === 0 ? (
