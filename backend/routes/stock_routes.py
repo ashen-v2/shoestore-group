@@ -8,7 +8,7 @@ from models.products import Product, Stock, StockCreate, StockRead, StockUpdate
 
 router : APIRouter = APIRouter( prefix="/stocks", tags=["stock"])
 
-@router.post("/{product_id}", response_model=StockRead, status_code=201)
+@router.post("/{product_id}", response_model=StockRead, status_code=201, tags=["moderator"])
 def create_stock(product_id: int, stock : StockCreate, session : Session = Depends(get_session), current_user : TokenData = Depends(allow_admin_moderator)):
     """Create a new stock item for a product"""
     
@@ -41,7 +41,7 @@ def get_stock(product_id: int, session : Session = Depends(get_session)):
     ).all()
     return stock_items
 
-@router.patch("/{stock_id}", response_model=StockRead)
+@router.patch("/{stock_id}", response_model=StockRead, tags=["moderator"])
 def update_stock(stock_id: int, stock : StockUpdate, session : Session = Depends(get_session), current_user : TokenData = Depends(allow_admin_moderator)):
     """Update a stock item"""
     db_stock = session.get(Stock, stock_id)
@@ -57,7 +57,7 @@ def update_stock(stock_id: int, stock : StockUpdate, session : Session = Depends
     session.refresh(db_stock)
     return db_stock
 
-@router.delete("/{stock_id}", status_code=204)
+@router.delete("/{stock_id}", status_code=204, tags=["moderator"])
 def delete_stock(stock_id: int, session : Session = Depends(get_session), current_user : TokenData = Depends(allow_admin_moderator)):
     """Delete a stock item"""
     db_stock = session.get(Stock, stock_id)
