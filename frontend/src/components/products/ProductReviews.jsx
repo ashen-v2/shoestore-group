@@ -57,19 +57,37 @@ const ProductReviews = ({ productId }) => {
                     reviews.map((review) => (
                         // Using the structure from the API response
                         <div key={review.id} className="bg-gray-50 p-6 rounded-xl border border-gray-100">
-                            <div className="flex items-center justify-between mb-4">
-                                <div className="flex items-center gap-1">
-                                    {renderStars(review.rating)}
+                            <div className="flex items-start justify-between mb-4">
+                                {/* User Info and Rating */}
+                                <div className="flex items-center gap-4">
+                                    {/* Profile Image with Fallback */}
+                                    {review.profile_image_url ? (
+                                        <img 
+                                            src={review.profile_image_url} 
+                                            alt={review.user_name} 
+                                            className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm"
+                                        />
+                                    ) : (
+                                        <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 font-black text-lg shadow-sm border-2 border-white">
+                                            {/* Show first letter of name, or 'U' for user */}
+                                            {review.user_name ? review.user_name.charAt(0).toUpperCase() : 'U'}
+                                        </div>
+                                    )}
+                                    
+                                    <div>
+                                        <p className="font-bold text-black">{review.user_name || `User #${review.user_id}`}</p>
+                                        <div className="flex items-center gap-1 mt-1">
+                                            {renderStars(review.rating)}
+                                        </div>
+                                    </div>
                                 </div>
+
                                 <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
                                     {new Date(review.created_at).toLocaleDateString()}
                                 </span>
                             </div>
-                            <p className="text-gray-700 font-medium leading-relaxed">
+                            <p className="text-gray-700 font-medium leading-relaxed ml-16">
                                 {review.description}
-                            </p>
-                            <p className="text-xs font-bold text-gray-400 mt-4">
-                                — User ID: {review.user_id}
                             </p>
                         </div>
                     ))

@@ -24,7 +24,7 @@ const Navbar = ({ onSearch }) => {
                 <div className="hidden md:flex items-center space-x-8 text-[14px] font-bold text-black ml-8 font-sans">
                     <Link to="/category" className="hover:text-gray-500">Categories</Link>
                     <Link to="/" className="hover:text-gray-500">Deals</Link>
-                    <Link to="/" className="hover:text-gray-500">What's New</Link>
+                    <Link to="/about" className="hover:text-gray-500">About Us</Link>
                     {/* Admin Link: Only visible to admins */}
                     {user?.role === 'admin' && (
                         <Link to="/admin" className="text-red-600 hover:text-red-700">
@@ -100,25 +100,52 @@ const Navbar = ({ onSearch }) => {
                                     {/* Link to Profile */}
                                     <Link
                                         to="/profile"
-                                        className="block px-4 py-2 text-xs font-bold text-gray-700 hover:bg-gray-50 hover:text-black"
+                                        className="block px-4 py-2 text-xs font-bold text-gray-700 hover:bg-gray-100 hover:text-black"
                                         onClick={() => setIsProfileOpen(false)}
                                     >
                                         Profile Settings
                                     </Link>
 
                                     {/* Link to Orders */}
-                                    <Link
+                                    {user.role === 1 && (
+                                        <Link
                                         to="/orders"
-                                        className="block px-4 py-2 text-xs font-bold text-gray-700 hover:bg-gray-50 hover:text-black"
+                                        className="block px-4 py-2 text-xs font-bold text-gray-700 hover:bg-gray-100 hover:text-black"
                                         onClick={() => setIsProfileOpen(false)}
                                     >
+                                        
                                         Orders & Returns
                                     </Link>
+                                    )}
+                                    
 
-                                    {user.role === 'admin' && (
+                                    {/* Link to reviews */}
+                                    {user.role === 1 && (
+                                         <Link
+                                            to="/my-reviews"
+                                            className="block px-4 py-2 text-xs font-bold text-gray-600 hover:bg-gray-100"
+                                            onClick={() => setIsProfileOpen(false)}
+                                        >
+                                            My Reviews
+                                        </Link>
+                                    )}
+
+                                    {/* Link to Help Desk */}
+                                    {user.role === 1 && (
+                                         <Link
+                                            to="/helpdesk"
+                                            className="block px-4 py-2 text-xs font-bold text-blue-600 hover:bg-blue-50"
+                                            onClick={() => setIsProfileOpen(false)}
+                                        >
+                                            Help Desk
+                                        </Link>
+                                    )}
+
+                                    {/* Link to Admin dashboard */}
+                                    {user.role === 0 && (
                                         <Link
                                             to="/admin"
-                                            className="block px-4 py-2 text-xs font-bold text-red-600 hover:bg-red-50"
+                                            className="block px-4 py-2 text-xs font-bold text-blue-600 hover:bg-blue-50"
                                             onClick={() => setIsProfileOpen(false)}
                                         >
                                             Admin Dashboard
@@ -130,7 +157,7 @@ const Navbar = ({ onSearch }) => {
                                             logout();
                                             setIsProfileOpen(false);
                                         }}
-                                        className="w-full text-left px-4 py-2 text-xs font-bold text-gray-700 hover:bg-gray-50 border-t border-gray-50 mt-1"
+                                        className="w-full text-left px-4 py-2 text-xs font-bold text-red-700 hover:bg-red-50 border-t border-gray-50 mt-1"
                                     >
                                         Logout
                                     </button>

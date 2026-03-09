@@ -24,6 +24,7 @@ import MyReviews from './pages/customer/MyReviews';
 import HelpDesk from './pages/customer/HelpDesk';
 import ModeratorDashboard from './pages/moderator/ModeratorDashboard';
 import AdminHelpDesk from './pages/admin/AdminHelpDesk';
+import AboutUs from './pages/customer/AboutUs';
 
 const ROLE_MAP = {
   0: 'admin',
@@ -79,6 +80,7 @@ function App() {
             <Route path="/category" element={<Category />} />
             <Route path="/my-reviews" element={<MyReviews />} />
             <Route path="/helpdesk" element={<HelpDesk />} />
+            <Route path="/about" element={<AboutUs />} />
 
             {/* Moderator Routes */}
             <Route

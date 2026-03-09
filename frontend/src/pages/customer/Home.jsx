@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import api from '../../api/axiosConfig';
 import Navbar from '../../components/common/Navbar';
 import ProductCard from '../../components/products/ProductCard';
+import Footer from '../../components/common/Footer';
 
 const mockProducts = [
     {
@@ -152,60 +153,7 @@ const Home = () => {
                 </div>
             </div>
 
-            {/* Footer */}
-            <footer className="mt-8 border-t border-gray-100">
-                <div className="max-w-350 mx-auto px-6 py-16 grid grid-cols-1 md:grid-cols-[2fr_1fr_1fr_1fr_1fr] gap-8">
-                    {/* Logo Column */}
-                    <div>
-                        <h2 className="text-3xl font-black tracking-tighter">
-                            Lac<span className="text-gray-300">ed</span>
-                        </h2>
-                    </div>
-
-                    {/* Links Columns */}
-                    <div>
-                        <h3 className="font-bold text-black mb-6 text-[15px]">Brands</h3>
-                        <ul className="space-y-4 text-[14px] text-gray-500 font-semibold font-sans">
-                            <li><a href="#" className="hover:text-black transition-colors">Nike</a></li>
-                            <li><a href="#" className="hover:text-black transition-colors">Adidas</a></li>
-                        </ul>
-                    </div>
-
-                    <div>
-                        <h3 className="font-bold text-black mb-6 text-[15px]">Categories</h3>
-                        <ul className="space-y-4 text-[14px] text-gray-500 font-semibold font-sans">
-                            <li><a href="/category" className="hover:text-black transition-colors">Air Force</a></li>
-                            <li><a href="/category" className="hover:text-black transition-colors">Air Jordan</a></li>
-                            <li><a href="/category" className="hover:text-black transition-colors">Pegasus</a></li>
-                        </ul>
-                    </div>
-
-                    <div>
-                        <h3 className="font-bold text-black mb-6 text-[15px]">New Arrivals</h3>
-                        <ul className="space-y-4 text-[14px] text-gray-500 font-semibold font-sans">
-                            <li><a href="#" className="hover:text-black transition-colors">Latest Nike</a></li>
-                            <li><a href="#" className="hover:text-black transition-colors">Latest Adidas</a></li>
-                            <li><a href="#" className="hover:text-black transition-colors">Latest Pegasus</a></li>
-                            <li><a href="#" className="hover:text-black transition-colors">Limited Edition</a></li>
-                        </ul>
-                    </div>
-
-                    <div>
-                        <h3 className="font-bold text-black mb-6 text-[15px]">Quick Links</h3>
-                        <ul className="space-y-4 text-[14px] text-gray-500 font-semibold font-sans">
-                            <li><a href="/search" className="hover:text-black transition-colors">Search</a></li>
-                            <li><a href="#" className="hover:text-black transition-colors">Privacy Policy</a></li>
-                            <li><a href="#" className="hover:text-black transition-colors">Return Policy</a></li>
-                            <li><a href="#" className="hover:text-black transition-colors">Terms of Service</a></li>
-                            <li><a href="#" className="hover:text-black transition-colors">Contact Information</a></li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div className="text-center py-8 text-gray-500 text-[14px] font-semibold border-t border-gray-100 tracking-wide font-sans">
-                    © 2026 Laced PVT
-                </div>
-            </footer>
+            <Footer />
         </div>
     );
 };

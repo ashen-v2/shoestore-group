@@ -34,30 +34,58 @@ const AdminAnalytics = () => {
         fetchChartData(period);
     }, [period]);
 
-    // // 2. Handle the CSV Report Download
-    // const handleDownloadReport = async () => {
-    //     setDownloading(true);
-    //     try {
-    //         // Hitting the report endpoint. We use responseType 'blob' to handle the file download.
-    //         const response = await api.get('/admin/analytics/report?format=csv', {
-    //             responseType: 'blob', 
-    //         });
-            
-    //         // Create a fake link to force the browser to download the file
-    //         const url = window.URL.createObjectURL(new Blob([response.data]));
-    //         const link = document.createElement('a');
-    //         link.href = url;
-    //         link.setAttribute('download', `sales_report_${new Date().toISOString().split('T')[0]}.csv`);
-    //         document.body.appendChild(link);
-    //         link.click();
-    //         link.remove();
-    //     } catch (err) {
-    //         console.error("Failed to download report", err);
-    //         alert("Report generation failed. Is the backend endpoint ready?");
-    //     } finally {
-    //         setDownloading(false);
-    //     }
-    // };
+    const handleDownloadCSV = () => {
+        if (loading) {
+            alert("Please wait for chart data to finish loading.");
+            return;
+        }
+
+        // Don't download if the graph is empty or loading
+        if (!chartData || chartData.length === 0) {
+            alert("No data available to download.");
+            return;
+        }
+
+        setDownloading(true);
+        try {
+            const periodLabelMap = {
+                daily: 'Day',
+                weekly: 'Week',
+                monthly: 'Month'
+            };
+            const firstColumnHeader = periodLabelMap[period] || 'Period';
+            const headers = [firstColumnHeader, 'Total Revenue ($)'];
+
+            // Map existing graph data to create the rows
+            const csvRows = chartData.map(row => {
+                // Ensure revenue is formatted nicely
+                const formattedRevenue = Number(row.revenue).toFixed(2);
+                return `${row.label},${formattedRevenue}`;
+            });
+
+            // Join the headers and the rows together with line breaks (\n)
+            const csvContent = [headers.join(","), ...csvRows].join("\n");
+
+            // Create a "Blob" (Binary Large Object) to hold the file data in the browser
+            const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+
+            // Create a temporary download link, click it, and destroy it
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+
+            // Give the file a dynamic name with period + today's date
+            const today = new Date().toISOString().split('T')[0];
+            link.setAttribute("href", url);
+            link.setAttribute("download", `Laced_${period}_Sales_Report_${today}.csv`);
+
+            document.body.appendChild(link);
+            link.click(); // Automatically triggers the browser download
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        } finally {
+            setDownloading(false);
+        }
+    };
 
     return (
         <div className="flex min-h-screen bg-gray-50">
@@ -73,7 +101,7 @@ const AdminAnalytics = () => {
                         
                         {/* Download Report Button */}
                         <button 
-                            // onClick={handleDownloadReport}
+                            onClick={handleDownloadCSV}
                             disabled={downloading}
                             className={`px-6 py-3 font-black uppercase text-[10px] tracking-widest shadow-lg transition-all flex items-center gap-2 ${
                                 downloading ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-black text-white hover:bg-gray-800 active:scale-95'
@@ -100,6 +128,7 @@ const AdminAnalytics = () => {
                                 onChange={(e) => setPeriod(e.target.value)}
                                 className="p-2 border-2 border-gray-200 text-xs font-bold uppercase tracking-widest outline-none focus:border-black transition-colors"
                             >
+                                <option value="daily">Daily</option>
                                 <option value="weekly">Weekly</option>
                                 <option value="monthly">Monthly</option>
                             </select>

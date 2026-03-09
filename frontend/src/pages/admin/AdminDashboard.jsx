@@ -4,17 +4,19 @@ import AdminSidebar from '../../components/layout/AdminSidebar';
 
 const AdminDashboard = () => {
     const [products, setProducts] = useState([]);
+    const [dailySales, setDailySales] = useState([]);
+    const [salesLoading, setSalesLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [currentProductId, setCurrentProductId] = useState(null);
 
     const [showStockModal, setShowStockModal] = useState(false);
-    const [selectedProductStock, setSelectedProductStock] = useState(null); 
-    const [stockList, setStockList] = useState([]); 
-    const [newStock, setNewStock] = useState({ size: '', quantity: 0 }); 
+    const [selectedProductStock, setSelectedProductStock] = useState(null);
+    const [stockList, setStockList] = useState([]);
+    const [newStock, setNewStock] = useState({ size: '', quantity: 0 });
 
     const [productForm, setProductForm] = useState({
-        name: '', brand: '', category: 'uncategorized', price: 0, image_url: 'https://placehold.co/600x400'
+        name: '', brand: '', category: 'uncategorized', price: 0, description: '', image_url: 'https://placehold.co/600x400'
     });
 
     const categories = [
@@ -24,7 +26,10 @@ const AdminDashboard = () => {
         { value: 'uncategorized', label: 'Uncategorized' },
     ];
 
-    useEffect(() => { fetchInventory(); }, []);
+    useEffect(() => {
+        fetchInventory();
+        fetchDailySales();
+    }, []);
 
     const fetchInventory = async () => {
         try {
@@ -32,6 +37,19 @@ const AdminDashboard = () => {
             setProducts(response.data);
         } catch (err) {
             console.error("Failed to fetch inventory", err);
+        }
+    };
+
+    const fetchDailySales = async () => {
+        setSalesLoading(true);
+        try {
+            const response = await api.get('/admin/analytics/sales-total/daily');
+            setDailySales(response.data || []);
+        } catch (err) {
+            console.error("Failed to fetch Daily sales analytics", err);
+            setDailySales([]);
+        } finally {
+            setSalesLoading(false);
         }
     };
 
@@ -50,7 +68,7 @@ const AdminDashboard = () => {
     // Add new size/quantity pair to the stock list
     const handleAddStock = async (e) => {
         e.preventDefault();
-        e.stopPropagation(); 
+        e.stopPropagation();
 
         try {
             const payload = {
@@ -59,11 +77,11 @@ const AdminDashboard = () => {
             };
 
             await api.post(`/stocks/${selectedProductStock.id}`, payload);
-            
-            setNewStock({ size: '', quantity: '' }); 
+
+            setNewStock({ size: '', quantity: '' });
             const response = await api.get(`/stocks/${selectedProductStock.id}`);
             setStockList(response.data);
-            
+
         } catch (err) {
             if (err.response?.status === 422) {
                 const errorDetails = err.response.data.detail[0];
@@ -96,6 +114,7 @@ const AdminDashboard = () => {
             brand: product.brand,
             category: product.category,
             price: product.price,
+            description: product.description,
             image_url: product.image_url
         });
         setShowModal(true);
@@ -103,7 +122,7 @@ const AdminDashboard = () => {
 
     const openAddModal = () => {
         setIsEditing(false);
-        setProductForm({ name: '', brand: '', category: 'uncategorized', price: 0, image_url: 'https://placehold.co/600x400' });
+        setProductForm({ name: '', brand: '', category: 'uncategorized', price: 0, description: '', image_url: 'https://placehold.co/600x400' });
         setShowModal(true);
     };
 
@@ -133,6 +152,8 @@ const AdminDashboard = () => {
     const totalStock = products.length;
     const nikeCount = products.filter(p => p.brand.toLowerCase() === 'nike').length;
     const adidasCount = products.filter(p => p.brand.toLowerCase() === 'adidas').length;
+    const maxDailyRevenue = Math.max(...dailySales.map((item) => Number(item.revenue) || 0), 1);
+    const dailyRevenueTotal = dailySales.reduce((sum, item) => sum + (Number(item.revenue) || 0), 0);
 
     return (
         <div className="flex min-h-screen bg-gray-50">
@@ -168,17 +189,43 @@ const AdminDashboard = () => {
                     {/* Sales Trend Visualization */}
                     <div className="bg-white p-8 border border-gray-100 shadow-sm rounded-xl mb-12">
                         <div className="flex justify-between items-center mb-6">
-                            <h3 className="text-black text-sm font-black uppercase italic tracking-wider">Weekly Sales Performance</h3>
-                            <span className="text-[10px] bg-green-100 text-green-700 px-3 py-1 font-black rounded-full uppercase tracking-tighter">+18% Revenue</span>
+                            <h3 className="text-black text-sm font-black uppercase italic tracking-wider">Daily Sales Performance</h3>
+                            <span className="text-[10px] bg-green-100 text-green-700 px-3 py-1 font-black rounded-full uppercase tracking-tighter">
+                                ${dailyRevenueTotal.toFixed(2)} Total
+                            </span>
                         </div>
-                        <div className="flex items-end space-x-3 h-32 mb-4">
-                            {[40, 70, 45, 90, 65, 80, 100].map((height, i) => (
-                                <div key={i} className="flex-1 bg-black hover:bg-gray-700 transition-all duration-300 rounded-t-sm" style={{ height: `${height}%` }}></div>
-                            ))}
-                        </div>
-                        <div className="flex justify-between text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                            <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
-                        </div>
+                        {salesLoading ? (
+                            <div className="h-32 mb-4 flex items-center justify-center text-gray-400 text-xs font-black uppercase tracking-widest">
+                                Loading sales data...
+                            </div>
+                        ) : dailySales.length === 0 ? (
+                            <div className="h-32 mb-4 flex items-center justify-center text-gray-400 text-xs font-black uppercase tracking-widest">
+                                No daily sales data
+                            </div>
+                        ) : (
+                            <>
+                                <div className="flex items-end space-x-3 h-32 mb-4">
+                                    {dailySales.map((item, i) => {
+                                        const revenue = Number(item.revenue) || 0;
+                                        const barHeight = Math.max((revenue / maxDailyRevenue) * 100, revenue > 0 ? 6 : 2);
+
+                                        return (
+                                            <div
+                                                key={`${item.label}-${i}`}
+                                                className="flex-1 bg-black hover:bg-gray-700 transition-all duration-300 rounded-t-sm"
+                                                style={{ height: `${barHeight}%` }}
+                                                title={`${item.label}: $${revenue.toFixed(2)}`}
+                                            ></div>
+                                        );
+                                    })}
+                                </div>
+                                <div className="flex justify-between text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                    {dailySales.map((item, i) => (
+                                        <span key={`label-${item.label}-${i}`}>{item.label}</span>
+                                    ))}
+                                </div>
+                            </>
+                        )}
                     </div>
 
                     {/* Inventory Table Section*/}
@@ -304,58 +351,77 @@ const AdminDashboard = () => {
             {/* Modal */}
             {showModal && (
                 <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-100 p-4">
-                    <div className="bg-white p-10 max-w-md w-full shadow-2xl rounded-2xl">
-                        <h2 className="text-2xl font-black mb-8 uppercase italic tracking-tight text-black border-b pb-4">
-                            {isEditing ? 'Update Inventory' : 'Add New Arrival'}
+                    <div className="bg-white p-6 max-w-4xl w-full shadow-2xl rounded-2xl max-h-[90vh] overflow-y-auto">
+                        <h2 className="text-2xl font-black mb-6 uppercase italic tracking-tight text-black border-b pb-4">
+                            {isEditing ? 'Update Inventory' : 'Add New Products'}
                         </h2>
-                        <form onSubmit={handleSubmit} className="space-y-5">
-                            <div className="space-y-1">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Model Name</label>
-                                <input
-                                    type="text" required value={productForm.name}
-                                    className="w-full border-2 border-gray-100 p-3 focus:border-black outline-none font-bold text-sm transition-all"
-                                    onChange={(e) => setProductForm({ ...productForm, name: e.target.value })}
-                                />
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-1">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Brand</label>
-                                    <input
-                                        type="text" required value={productForm.brand}
-                                        className="w-full border-2 border-gray-100 p-3 focus:border-black outline-none font-bold text-sm transition-all"
-                                        onChange={(e) => setProductForm({ ...productForm, brand: e.target.value })}
-                                    />
+                        <form onSubmit={handleSubmit} className="space-y-4">
+                            <div className="grid grid-cols-2 gap-6">
+                                {/* Left Column */}
+                                <div className="space-y-4">
+                                    <div className="space-y-1">
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Model Name</label>
+                                        <input
+                                            type="text" required value={productForm.name}
+                                            className="w-full border-2 border-gray-100 p-3 focus:border-black outline-none font-bold text-sm transition-all rounded"
+                                            onChange={(e) => setProductForm({ ...productForm, name: e.target.value })}
+                                        />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Brand</label>
+                                        <input
+                                            type="text" required value={productForm.brand}
+                                            className="w-full border-2 border-gray-100 p-3 focus:border-black outline-none font-bold text-sm transition-all rounded"
+                                            onChange={(e) => setProductForm({ ...productForm, brand: e.target.value })}
+                                        />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Type</label>
+                                        <select
+                                            value={productForm.category}
+                                            className="w-full border-2 border-gray-100 p-3 focus:border-black outline-none bg-white font-bold text-sm transition-all rounded"
+                                            onChange={(e) => setProductForm({ ...productForm, category: e.target.value })}
+                                        >
+                                            {categories.map(cat => <option key={cat.value} value={cat.value}>{cat.label}</option>)}
+                                        </select>
+                                    </div>
+                                    <div className="space-y-1">
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Retail Price (USD)</label>
+                                        <input
+                                            type="number" required value={productForm.price}
+                                            className="w-full border-2 border-gray-100 p-3 focus:border-black outline-none font-black italic text-sm transition-all rounded"
+                                            onChange={(e) => setProductForm({ ...productForm, price: parseFloat(e.target.value) })}
+                                        />
+                                    </div>
                                 </div>
-                                <div className="space-y-1">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Type</label>
-                                    <select
-                                        value={productForm.category}
-                                        className="w-full border-2 border-gray-100 p-3 focus:border-black outline-none bg-white font-bold text-sm transition-all"
-                                        onChange={(e) => setProductForm({ ...productForm, category: e.target.value })}
-                                    >
-                                        {categories.map(cat => <option key={cat.value} value={cat.value}>{cat.label}</option>)}
-                                    </select>
+
+                                {/* Right Column */}
+                                <div className="space-y-4">
+                                    <div className="space-y-1">
+                                        <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Product Description *</label>
+                                        <textarea
+                                            required
+                                            rows="8"
+                                            value={productForm.description}
+                                            onChange={(e) => setProductForm({ ...productForm, description: e.target.value })}
+                                            className="p-4 border-2 border-gray-200 text-sm font-medium w-full outline-none focus:border-black transition-colors resize-none rounded"
+                                            placeholder="Describe the shoe's materials, fit, and style..."
+                                        />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Image Source URL</label>
+                                        <input
+                                            type="text" value={productForm.image_url}
+                                            className="w-full border-2 border-gray-100 p-3 focus:border-black outline-none font-medium text-xs text-gray-500 transition-all rounded"
+                                            onChange={(e) => setProductForm({ ...productForm, image_url: e.target.value })}
+                                        />
+                                    </div>
                                 </div>
                             </div>
-                            <div className="space-y-1">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Retail Price (USD)</label>
-                                <input
-                                    type="number" required value={productForm.price}
-                                    className="w-full border-2 border-gray-100 p-3 focus:border-black outline-none font-black italic text-sm transition-all"
-                                    onChange={(e) => setProductForm({ ...productForm, price: parseFloat(e.target.value) })}
-                                />
-                            </div>
-                            <div className="space-y-1">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Image Source URL</label>
-                                <input
-                                    type="text" value={productForm.image_url}
-                                    className="w-full border-2 border-gray-100 p-3 focus:border-black outline-none font-medium text-xs text-gray-500 transition-all"
-                                    onChange={(e) => setProductForm({ ...productForm, image_url: e.target.value })}
-                                />
-                            </div>
-                            <div className="flex justify-end space-x-3 pt-6">
-                                <button type="button" onClick={() => setShowModal(false)} className="px-6 py-3 font-black uppercase text-[10px] tracking-widest border-2 hover:bg-gray-50 transition-colors">Cancel</button>
-                                <button type="submit" className="px-8 py-3 bg-black text-white font-black uppercase text-[10px] tracking-widest hover:bg-gray-800 shadow-lg active:scale-95 transition-all">
+
+                            <div className="flex justify-end space-x-3 pt-6 border-t">
+                                <button type="button" onClick={() => setShowModal(false)} className="px-6 py-3 font-black uppercase text-[10px] tracking-widest border-2 hover:bg-gray-50 transition-colors rounded">Cancel</button>
+                                <button type="submit" className="px-8 py-3 bg-black text-white font-black uppercase text-[10px] tracking-widest hover:bg-gray-800 shadow-lg active:scale-95 transition-all rounded">
                                     {isEditing ? 'Push Updates' : 'Commit to DB'}
                                 </button>
                             </div>

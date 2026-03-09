@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import api from '../../api/axiosConfig';
 import Navbar from '../../components/common/Navbar';
 import ProductCard from '../../components/products/ProductCard';
+import Footer from '../../components/common/Footer';
 
 const Category = () => {
     const [products, setProducts] = useState([]);
@@ -173,6 +174,8 @@ const Category = () => {
                     </div>
                 </div>
             </div>
+
+            <Footer />
         </div>
     );
 };
