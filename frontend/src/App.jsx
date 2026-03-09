@@ -19,6 +19,9 @@ import AdminAnalytics from './pages/admin/AdminAnalytics';
 import Wishlist from './pages/customer/Wishlist';
 import Category from './pages/customer/Category';
 import MyReviews from './pages/customer/MyReviews';
+import HelpDesk from './pages/customer/HelpDesk';
+import ModeratorDashboard from './pages/moderator/ModeratorDashboard';
+import AdminHelpDesk from './pages/admin/AdminHelpDesk';
 
 // Role-Based Guard Component
 const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -52,6 +55,18 @@ function App() {
             <Route path="/wishlist" element={<Wishlist />} />
             <Route path="/category" element={<Category />} />
             <Route path="/my-reviews" element={<MyReviews />} />
+            <Route path="/helpdesk" element={<HelpDesk />} />
+
+            {/* Moderator Routes */}
+            <Route
+              path="/moderator"
+              element={
+                // <ProtectedRoute allowedRoles={['moderator']}>
+                //   <ModeratorDashboard />
+                // </ProtectedRoute>
+                <ModeratorDashboard />
+              }
+            />
 
             {/* Admin Routes*/}
              <Route
@@ -88,6 +103,15 @@ function App() {
                 //   <AdminAnalytics />
                 // </ProtectedRoute>
                 <AdminAnalytics />
+              }
+            />
+            <Route
+              path="/admin/helpdesk"
+              element={
+                // <ProtectedRoute allowedRoles={['admin']}>
+                //   <AdminHelpDesk />
+                // </ProtectedRoute>
+                <AdminHelpDesk />
               }
             />
             </Routes>

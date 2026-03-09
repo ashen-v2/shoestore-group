@@ -67,6 +67,8 @@ export const AuthProvider = ({ children }) => {
 
     const logout = () => {
         localStorage.removeItem('token');
+        const shouldLogout = window.confirm('Are you sure you want to log out?');
+        if (!shouldLogout) return;
         setUser(null);
     };
 

@@ -7,6 +7,9 @@ const AdminSidebar = () => {
     const location = useLocation(); // Gets the current URL path
 
     const handleLogout = () => {
+        const shouldLogout = window.confirm('Are you sure you want to log out?');
+        if (!shouldLogout) return;
+
         logout();
         navigate('/login');
     };
@@ -64,6 +67,12 @@ const AdminSidebar = () => {
                     className="block p-3 text-gray-400 hover:text-white transition-colors border-t border-gray-800 pt-6 mt-4"
                 >
                     View Website
+                </Link>
+                <Link 
+                    to="/admin/helpdesk" 
+                    className={`block p-3 rounded-md transition-colors ${isActive('/admin/helpdesk') ? 'bg-white text-black' : 'bg-transparent text-gray-300 hover:bg-gray-900'}`}
+                >
+                    Help Desk
                 </Link>
             </nav>
 
