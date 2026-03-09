@@ -99,6 +99,7 @@ const AdminHelpDesk = () => {
                                                         onChange={(e) => handleStatusUpdate(ticket.id, e.target.value)}
                                                         className={`text-xs font-black uppercase tracking-widest p-2 rounded-md border outline-none cursor-pointer transition-colors ${
                                                             ticket.status === 'open' ? 'bg-yellow-50 text-yellow-700 border-yellow-200' :
+                                                            ticket.status === 'in_progress' ? 'border-orange-300 bg-orange-100 text-orange-500' :
                                                             ticket.status === 'resolved' ? 'bg-green-50 text-green-700 border-green-200' :
                                                             'bg-gray-50 text-gray-700 border-gray-200'
                                                         }`}
