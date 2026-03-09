@@ -18,7 +18,7 @@ const AdminAnalytics = () => {
             setChartData(response.data);
         } catch (err) {
             console.error("Failed to fetch chart data", err);
-            // Fallback mock data so you can see the graph while your friend builds the backend!
+            // Fallback mock data in case of API failure (for development/testing)
             setChartData([
                 { label: 'Mon', revenue: 120 }, { label: 'Tue', revenue: 300 },
                 { label: 'Wed', revenue: 150 }, { label: 'Thu', revenue: 400 },
