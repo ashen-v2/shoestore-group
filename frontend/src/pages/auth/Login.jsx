@@ -17,14 +17,16 @@ const Login = () => {
         setIsLoading(true); // Lock the button and start loading
 
         try {
-            // The login function in AuthContext MUST have `await fetchCurrentUser()` 
-            // inside it for this to wait for the profile image!
             const role = await login(email, password);
             
             // Redirect based on role
-            if (role === 'admin') {
+            if (role === 0) {
                 navigate('/admin');
-            } else {
+            }
+            else if (role === 2) {
+                navigate('/moderator');
+            } 
+            else {
                 navigate('/');
             }
         } catch (err) {

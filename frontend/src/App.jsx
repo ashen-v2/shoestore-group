@@ -1,4 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+
+// Auth and Role Context
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import { WishlistProvider } from './context/WishlistContext'; 
@@ -23,13 +25,34 @@ import HelpDesk from './pages/customer/HelpDesk';
 import ModeratorDashboard from './pages/moderator/ModeratorDashboard';
 import AdminHelpDesk from './pages/admin/AdminHelpDesk';
 
-// Role-Based Guard Component
+const ROLE_MAP = {
+  0: 'admin',
+  '0': 'admin',
+  1: 'user',
+  '1': 'user',
+  2: 'moderator',
+  '2': 'moderator'
+};
+
 const ProtectedRoute = ({ children, allowedRoles }) => {
-  const { user } = useAuth();
+  const { user } = useAuth(); 
 
-  if (!user) return <Navigate to="/login" />;
-  if (!allowedRoles.includes(user.role)) return <Navigate to="/" />;
+  // Not logged in? Send to login page.
+  if (!user) {
+      return <Navigate to="/login" replace />;
+  }
 
+  // Translate the integer role into a string, fallback to 'unknown'
+  const userRoleString = ROLE_MAP[user.role] || 'unknown';
+
+  // Check if the user's role is in the allowed list
+  const safeAllowedRoles = allowedRoles.map(r => r.toLowerCase());
+  
+  if (!safeAllowedRoles.includes(userRoleString)) {
+      return <Navigate to="/" replace />; // Kick unauthorized users to home
+  }
+
+  // Access Granted! Render the protected page.
   return children;
 };
 
@@ -61,10 +84,9 @@ function App() {
             <Route
               path="/moderator"
               element={
-                // <ProtectedRoute allowedRoles={['moderator']}>
-                //   <ModeratorDashboard />
-                // </ProtectedRoute>
-                <ModeratorDashboard />
+                <ProtectedRoute allowedRoles={['moderator']}>
+                  <ModeratorDashboard />
+                </ProtectedRoute>
               }
             />
 
@@ -72,46 +94,41 @@ function App() {
              <Route
               path="/admin"
               element={
-                // <ProtectedRoute allowedRoles={['admin']}>
-                //   <AdminDashboard />
-                // </ProtectedRoute>
-                <AdminDashboard />
+                <ProtectedRoute allowedRoles={['admin']}>
+                  <AdminDashboard />
+                </ProtectedRoute>
               }
             /> 
             <Route
               path="/admin/orders"
               element={
-                // <ProtectedRoute allowedRoles={['admin']}>
-                //   <AdminOrders />
-                // </ProtectedRoute>
-                <AdminOrders />
+                <ProtectedRoute allowedRoles={['admin']}>
+                  <AdminOrders />
+                </ProtectedRoute>
               }
             />
             <Route
               path="/admin/payments"
               element={
-                // <ProtectedRoute allowedRoles={['admin']}>
-                //   <AdminPayments />
-                // </ProtectedRoute>
-                <AdminPayments />
+                <ProtectedRoute allowedRoles={['admin']}>
+                  <AdminPayments />
+                </ProtectedRoute>
               }
             />
             <Route
               path="/admin/analytics"
               element={
-                // <ProtectedRoute allowedRoles={['admin']}>
-                //   <AdminAnalytics />
-                // </ProtectedRoute>
-                <AdminAnalytics />
+                <ProtectedRoute allowedRoles={['admin']}>
+                  <AdminAnalytics />
+                </ProtectedRoute>
               }
             />
             <Route
               path="/admin/helpdesk"
               element={
-                // <ProtectedRoute allowedRoles={['admin']}>
-                //   <AdminHelpDesk />
-                // </ProtectedRoute>
-                <AdminHelpDesk />
+                <ProtectedRoute allowedRoles={['admin']}>
+                  <AdminHelpDesk />
+                </ProtectedRoute>
               }
             />
             </Routes>

@@ -7,9 +7,6 @@ const AdminSidebar = () => {
     const location = useLocation(); // Gets the current URL path
 
     const handleLogout = () => {
-        const shouldLogout = window.confirm('Are you sure you want to log out?');
-        if (!shouldLogout) return;
-
         logout();
         navigate('/login');
     };
