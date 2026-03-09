@@ -28,3 +28,7 @@ class ReviewUpdate(SQLModel):
     rating : int | None = 5
     description : str | None = Field(default=None, nullable=True, max_length=300)
     created_at : datetime = Field(default_factory=lambda : datetime.now(timezone.utc), nullable=False)
+
+class ReviewReadWithProduct(Review):
+    user_name : str | None = None
+    profile_image_url : str | None = None

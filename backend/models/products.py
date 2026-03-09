@@ -18,6 +18,7 @@ class Product(SQLModel, table=True):
     price: float = Field(nullable=False)
     image_url: str = Field(default="https://placehold.co/600x400", nullable=False)
     created_at: datetime = Field(default_factory=lambda : datetime.now(timezone.utc), nullable=False)
+    description: str | None = Field(default=None, nullable=True)
     
 
 class ProductCreate(SQLModel):
@@ -26,6 +27,7 @@ class ProductCreate(SQLModel):
     category: str = Field(default=ProductCategory.UNCATEGORIZED, nullable=False)
     price: float 
     image_url: str | None = Field(default="https://placehold.co/600x400", nullable=True)
+    description: str | None = Field(default=None, nullable=True)
 
 class ProductRead(Product):
     pass
@@ -36,6 +38,7 @@ class ProductUpdate(SQLModel):
     category: str | None = None
     price: float | None = None
     image_url: str | None = None
+    description: str | None = None
 
 
 """Stock models"""
