@@ -31,7 +31,7 @@ const Navbar = ({ onSearch }) => {
 
                 {/* Desktop Categories (Hidden on Mobile) */}
                 <div className="hidden md:flex items-center space-x-8 text-[14px] font-bold text-black ml-8 font-sans">
-                    <Link to="/category" className="hover:text-gray-500 transition-colors">Categories</Link>
+                    <Link to="/category" className="hover:text-gray-500 transition-colors">Collection</Link>
                     <Link to="/" className="hover:text-gray-500 transition-colors">Deals</Link>
                     <Link to="/about" className="hover:text-gray-500 transition-colors">About Us</Link>
                 </div>
