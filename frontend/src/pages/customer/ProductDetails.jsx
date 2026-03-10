@@ -152,7 +152,7 @@ const ProductDetails = () => {
 
                         {/* Product Description */}
                         <div className="text-base text-gray-700 leading-relaxed mb-10">
-                            <p>Nothing as fly, nothing as comfortable, nothing as proven. The {product.name} stays true to its roots while offering a fresh take on what you know best. Built for performance and styled for the streets.</p>
+                            <p>{product.description}</p>
                             <ul className="list-disc pl-5 mt-4 space-y-1 text-sm font-medium">
                                 <li>Shown: Custom / Default</li>
                                 <li>Category: {product.category.charAt(0).toUpperCase() + product.category.slice(1)}</li>
