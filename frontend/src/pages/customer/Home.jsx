@@ -71,15 +71,21 @@ const Home = () => {
             <Navbar onSearch={setSearch} />
 
             {/* Top Banner */}
-            <div className="max-w-350 mx-auto px-6 mt-6">
-                <div className="w-full h-75 rounded-3xl overflow-hidden relative bg-gray-100 shadow-sm border border-gray-100">
+            <div className="max-w-350 mx-auto px-4 sm:px-6 mt-4 sm:mt-6">
+                <div className="w-full h-[58vw] min-h-52.5 max-h-85 md:h-80 md:max-h-none rounded-2xl md:rounded-3xl overflow-hidden relative bg-gray-100 shadow-sm border border-gray-100">
                     <img
                         src="/src/assets/images/nike_banner.jpg"
                         alt="Just Do It"
-                        className="w-full h-full object-cover"
+                        className="hidden md:block w-full h-full object-cover"
                         onError={(e) => {
                             e.target.src = "https://images.unsplash.com/photo-1556906781-9a412961c28c?q=80&w=2000&auto=format&fit=crop";
                         }}
+                    />
+                    {/* Mobile image */}
+                    <img 
+                        src="/src/assets/images/nike_banner_mobile.jpg" 
+                        alt="Just Do It Mobile" 
+                        className="block md:hidden w-full h-full object-cover object-center"
                     />
                 </div>
             </div>

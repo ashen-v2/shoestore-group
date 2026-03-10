@@ -9,7 +9,7 @@ const AdminAnalytics = () => {
     const [loading, setLoading] = useState(true);
     const [downloading, setDownloading] = useState(false);
 
-    // 1. Fetch the Graph Data
+    // Fetch the Graph Data
     const fetchChartData = async (selectedPeriod) => {
         setLoading(true);
         try {
@@ -135,7 +135,7 @@ const AdminAnalytics = () => {
                         </div>
 
                         {/* Recharts Bar Graph */}
-                        <div className="h-[400px] w-full mt-4">
+                        <div className="h-100 w-full mt-4">
                             {loading ? (
                                 <div className="h-full flex items-center justify-center text-gray-400 font-black uppercase tracking-widest text-sm">
                                     Loading Chart Data...
