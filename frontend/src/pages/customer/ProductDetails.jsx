@@ -10,13 +10,10 @@ const ProductDetails = () => {
     const { id } = useParams();
     const { addToCart } = useCart();
 
-    
-
     const [product, setProduct] = useState(null);
     const [stock, setStock] = useState([]);
     const [selectedStockId, setSelectedStockId] = useState(null);
     const [loading, setLoading] = useState(true);
-    // const [isFavorite, setIsFavorite] = useState(false);
     const [selectedImage, setSelectedImage] = useState(null);
 
     useEffect(() => {
@@ -53,12 +50,11 @@ const ProductDetails = () => {
         addToCart(selectedStockId);
     };
 
-
     if (loading) return <div className="min-h-screen flex items-center justify-center font-black uppercase tracking-widest">Loading...</div>;
     if (!product) return <div className="min-h-screen flex items-center justify-center font-black uppercase tracking-widest">Product Not Found</div>;
 
     const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
-     // 2. Check if this specific shoe is already favorited
+    // Check if this specific shoe is already favorited
     const isFavorite = isInWishlist(product.id);
 
     const handleWishlistToggle = (e) => {
@@ -71,7 +67,6 @@ const ProductDetails = () => {
         }
     };
 
-
     return (
         <div className="bg-white min-h-screen">
             <Navbar />
@@ -81,7 +76,7 @@ const ProductDetails = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-x-2">
 
                     {/* Main Image Column */}
-                    <div className="lg:col-span-7 flex items-center justify-center sticky top-24 h-fit">
+                    <div className="lg:col-span-7 flex items-center justify-center relative lg:sticky lg:top-24 h-fit">
                         <img
                             src={selectedImage}
                             alt={product.name}

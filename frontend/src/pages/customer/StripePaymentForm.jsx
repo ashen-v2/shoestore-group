@@ -32,7 +32,7 @@ import { useCart } from '../../context/CartContext';
         } else if (paymentIntent && paymentIntent.status === 'succeeded') {
             // The payment was succesful!
             await fetchCart(); // Clear the frontend cart
-            navigate('/orders'); // send them to the success page.
+            navigate('/orders', { state: { fromCheckout: true } }); // send them to the success page.
         }
     };
 

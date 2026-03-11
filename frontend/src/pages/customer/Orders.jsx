@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import api from '../../api/axiosConfig';
 import Navbar from '../../components/common/Navbar';
 
@@ -7,6 +7,10 @@ const Orders = () => {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    
+    // Check if the user just arrived from a successful checkout
+    const location = useLocation();
+    const [showSuccessBanner, setShowSuccessBanner] = useState(location.state?.fromCheckout || false);
 
     useEffect(() => {
         const fetchOrders = async () => {
@@ -14,7 +18,7 @@ const Orders = () => {
                 // fetch the logged-in user's orders
                 const response = await api.get('/orders/');
 
-                const sortedOrders = response.data.sort((a, b) => new Date(b.created_at) -new Date(a.created_at));
+                const sortedOrders = response.data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
                 setOrders(sortedOrders);
             } catch (err) {
                 console.error("Failed to fetch orders", err);
@@ -29,11 +33,11 @@ const Orders = () => {
 
     // Helper function to format date strings
     const formatDate = (dateString) => {
-        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
         return new Date(dateString).toLocaleDateString(undefined, options);
     };
 
-    // Helper fuction for status pill colors
+    // Helper function for status pill colors
     const getStatusColor = (status) => {
         switch (status?.toLowerCase()) {
             case 'pending': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
@@ -50,6 +54,34 @@ const Orders = () => {
             <Navbar />
             
             <div className="max-w-5xl mx-auto px-6 py-12">
+                
+                {/* THE SUCCESS BANNER */}
+                {showSuccessBanner && (
+                    <div className="mb-10 bg-black text-white p-6 shadow-xl flex items-start sm:items-center justify-between gap-4 animate-fade-in-down border-l-4 border-green-400">
+                        <div className="flex items-center gap-4">
+                            <div className="bg-green-400/20 p-3 rounded-full hidden sm:block">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6 text-green-400">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-black uppercase tracking-widest text-green-400">Order Confirmed!</h3>
+                                <p className="text-sm font-medium text-gray-300 mt-1">
+                                    We've successfully processed your payment and sent a detailed receipt to your registered email address.
+                                </p>
+                            </div>
+                        </div>
+                        <button 
+                            onClick={() => setShowSuccessBanner(false)}
+                            className="text-gray-400 hover:text-white transition-colors p-2"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                )}
+
                 <div className="flex justify-between items-end mb-10 border-b border-gray-200 pb-6">
                     <div>
                         <h1 className="text-4xl font-black uppercase italic tracking-tighter text-black">
@@ -83,7 +115,7 @@ const Orders = () => {
                             <div key={order.id} className="bg-white border border-gray-100 shadow-sm overflow-hidden group">
                                 {/* Order Header */}
                                 <div className="bg-[#fcfcfc] border-b border-gray-100 p-6 flex flex-wrap flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                                    <div className="flex gap-8">
+                                    <div className="flex flex-wrap gap-8">
                                         <div>
                                             <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Order Number</p>
                                             <p className="font-bold text-black text-sm">#{order.id.toString().padStart(6, '0')}</p>
@@ -99,7 +131,7 @@ const Orders = () => {
                                     </div>
                                     
                                     {/* Action Button */}
-                                    <button className="text-[10px] font-black uppercase tracking-widest text-black border-b-2 border-transparent hover:border-black transition-all pb-1">
+                                    <button className="text-[10px] font-black uppercase tracking-widest text-black border-b-2 border-transparent hover:border-black transition-all pb-1 mt-2 md:mt-0">
                                         View Details
                                     </button>
                                 </div>
@@ -122,8 +154,8 @@ const Orders = () => {
                                     </div>
 
                                     {/* Expected Delivery Logic */}
-                                    <div className="text-right sm:text-left sm:ml-auto bg-gray-50 p-4 border border-gray-100">
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Updates</p>
+                                    <div className="text-left w-full sm:w-auto sm:text-right bg-gray-50 p-4 border border-gray-100">
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Status Updates</p>
                                         <p className="font-bold text-sm text-black">
                                             {order.delivery_status === 'pending' ? 'Preparing to ship' : 
                                              order.delivery_status === 'shipped' ? 'On the way' : 'Delivered'}
