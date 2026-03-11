@@ -1,16 +1,21 @@
 from fastapi import APIRouter, Depends, HTTPException, Header, Request
 from sqlmodel import Session, select
+from models.users import User
 from dependancies.dependancies import get_current_user
 from db.session import get_session
 from models.orders import Order
 from models.payments import Payment, PaymentRequest, PAYMENT_METHOD, PAYMENT_STATUS, StripeSecrets
 from models.tokens import TokenData
 from interigations.stripe_client import StripeClient
+from template_engine.ordertemplates import render_order_email
+from interigations.emails.mailtrap_client import MailtrapClient
 
 
 router : APIRouter = APIRouter( prefix="/payments", tags=["payments"])
 
 stripe_client : StripeClient = StripeClient()
+mailtrap_client : MailtrapClient = MailtrapClient()
+
 
 @router.post("/webhook")
 async def stripe_webhook(request: Request, 
@@ -27,6 +32,18 @@ def create_payment(order_id : int, payment_method : PaymentRequest, session : Se
     if not order or order.user_id != current_user.user_id:
         raise HTTPException(status_code=404, detail="Invalid Order")
     
+    user : User = session.get(User, current_user.user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    user_email : str = user.email
+    user_name : str = user.name
+
+    # order_email template data
+    email_data : dict = {"customer_name": user_name, 
+                         "order_id": order_id, "amount": order.total_price, 
+                         "date": order.created_at,
+                         "order_url": f"http://localhost:5173/orders"}
+    
     match payment_method.payment_type:
         case PAYMENT_METHOD.CASH_ON_DELIVERY:
             payment : Payment = Payment(order_id=order_id, amount=order.total_price, method=payment_method.payment_type, status=PAYMENT_STATUS.COD_PENDING)
@@ -35,6 +52,12 @@ def create_payment(order_id : int, payment_method : PaymentRequest, session : Se
             session.add(order)
             session.commit()
             session.refresh(payment)
+
+            #send email
+            mailtrap_client.send_email(to_email=user_email, 
+                                       subject="Payment Successfull",
+                                       html_content=render_order_email(email_data), 
+                                       text_content=f"Dear {user_name},\n\nThank you for your order #{order_id}. Your order total is ${order.total_price} and it will be delivered to you soon.\n\nBest regards,\nElased Team"  )
             return payment
         case PAYMENT_METHOD.STRIPE:
             
@@ -48,6 +71,7 @@ def create_payment(order_id : int, payment_method : PaymentRequest, session : Se
             session.add(order)
             session.commit()
             session.refresh(payment)
+        
             return stripe_secrets
         
    
