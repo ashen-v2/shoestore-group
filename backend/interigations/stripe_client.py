@@ -2,10 +2,14 @@ from config.config import settings
 import stripe
 from models.orders import Order
 from models.payments import Payment
+from models.users import User
 from sqlmodel import Session, select
 from utils.other_utils import ReviewTools
+from interigations.emails.mailtrap_client import MailtrapClient
+from template_engine.ordertemplates import render_order_email
 
 stripe.api_key = settings.stripe_secret_key
+mailtrapclient : MailtrapClient = MailtrapClient()
 
 class StripeClient:
     def create_payment_intent(self,order_amount: float, payment : Payment, session: Session, currency: str = "usd", description: str = "") -> dict:
@@ -54,8 +58,23 @@ class StripeClient:
             order.payment_status = "completed"
             session.add(order)
             session.flush()
+
             reviewtools : ReviewTools = ReviewTools(order.id, order.user_id, session) # create instance of a class to create review templates
             reviewtools.autoReviews()
+            
+            user : User = session.get(User, order.user_id)
+            user_email : str = user.email
+            user_name : str = user.name
+
+             # order_email template data
+            email_data : dict = {"customer_name": user_name, 
+                         "order_id": order.id, "amount": order.total_price, 
+                         "date": order.created_at,
+                         "order_url": f"http://localhost:5173/orders"}
+            mailtrapclient.send_email(to_email=user_email, 
+                                       subject="Payment Successful",
+                                       html_content=render_order_email(email_data), 
+                                       text_content=f"Dear {user_name},\n\nYour payment for order #{order.id} was successful. Your order total is ${order.total_price} and it will be delivered to you soon.\n\nBest regards,\nElased Team"  )
             session.commit()
             return {"message": "Payment verified and order updated"}
         else:
