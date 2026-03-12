@@ -159,7 +159,7 @@ const Profile = () => {
                                     onChange={(e) => setFormData({...formData, payment_preference: e.target.value})}
                                 >
                                     <option value="Credit Card">Credit Card</option>
-                                    <option value="PayPal">PayPal</option>
+                                    <option value="Cash on Delivery">Cash on Delivery</option>
                                     <option value="Apple Pay">Apple Pay</option>
                                 </select>
                             </div>

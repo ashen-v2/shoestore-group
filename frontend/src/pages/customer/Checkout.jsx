@@ -63,7 +63,7 @@ const Checkout = () => {
             // Clean up and Redirect (For COD, this happens instantly)
             if (paymentMethod === 'COD') {
                 await fetchCart(); // Clear the cart
-                navigate('/orders'); // Send them to the success page
+                navigate('/orders', { state: { fromCheckout: true } }); // Send them to the success page
             }
 
         } catch (err) {

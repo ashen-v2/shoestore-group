@@ -9,7 +9,7 @@ const Register = () => {
         email: '',
         address: '',
         password: '',
-        payment_preference: 'Credit Card' // add this later
+        payment_preference: 'Credit Card'
     });
     const [error, setError] = useState('');
     const navigate = useNavigate();
@@ -18,7 +18,7 @@ const Register = () => {
         e.preventDefault();
         setError('');
         try {
-            // Requirement: Prevent duplicate accounts (handled by backend 400 error)
+            // Prevent duplicate accounts (handled by backend 400 error)
             await api.post('/users/', formData);
             navigate('/login');
         } catch (err) {
@@ -72,7 +72,7 @@ const Register = () => {
                             onChange={(e) => setFormData({...formData, payment_preference: e.target.value})}
                         >
                             <option value="Credit Card">Credit Card</option>
-                            <option value="PayPal">PayPal</option>
+                            <option value="Cash on Delivery">Cash on Delivery</option>
                             <option value="Apple Pay">Apple Pay</option>
                         </select>
                         <input
