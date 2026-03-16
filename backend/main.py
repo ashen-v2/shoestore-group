@@ -1,6 +1,7 @@
 from fastapi import Depends, FastAPI
 from fastapi.concurrency import asynccontextmanager
-from db.session import engine, get_session
+from db.session import engine
+from config.config import Settings
 from fastapi.middleware.cors import CORSMiddleware
 from routes import user_routes, product_routes, stock_routes, cart_routes, issueticket_routes
 from routes import order_routes, payment_routes, admin_routes,wishlist_routes, review_routes
@@ -16,9 +17,11 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI()
 
+settings = Settings()
+origins : list[str] = settings.origins.split(",")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

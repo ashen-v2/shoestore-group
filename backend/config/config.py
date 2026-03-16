@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     stripe_secret_key:str
     stripe_web_hook_secret:str
     mail_api_key:str
+    origins:str 
 
     model_config = SettingsConfigDict(env_file=".env")
 
