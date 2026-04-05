@@ -2,6 +2,11 @@
 
 A small full-stack e-commerce project (FastAPI backend + Vite/React frontend) used for group development and learning.
 
+## Preview
+
+![Homepage screenshot](frontend/public/screenshots/homepage.jpg)
+
+
 ## Project structure (top-level)
 - `backend/` — FastAPI app, database models, migrations
 - `frontend/` — Vite + React app
@@ -28,10 +33,5 @@ npm run dev
 - Backend: Python 3.10+ (see `backend/requirements.txt`)
 - Frontend: Node 16+ (Vite + React)
 
-## Preview
-
-```md
-![Homepage screenshot](frontend/public/screenshots/homepage.jpg)
-```
 
 
