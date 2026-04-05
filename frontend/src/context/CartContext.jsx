@@ -10,14 +10,14 @@ export const CartProvider = ({ children }) => {
     const [cartItems, setCartItems] = useState([]);
     const { user } = useAuth(); // Listen for user login/logout
 
-    // 1. GET /cart/ - Fetch current user's cart items
+    // GET /cart/ - Fetch current user's cart items
     const fetchCart = async () => {
         if (!user) {
             setCartItems([]); // Clear cart if they log out
             return;
         }
         try {
-            // Step A: Get the raw cart data (just stock_id and quantity)
+            // Get the raw cart data (just stock_id and quantity)
             const cartRes = await api.get('/cart/');
             const rawCartItems = cartRes.data;
 
@@ -26,11 +26,11 @@ export const CartProvider = ({ children }) => {
                 return;
             }
 
-            // Step B: Fetch ALL products so we can hunt for the details
+            // Fetch ALL products so we can hunt for the details
             const productsRes = await api.get('/products/');
             const allProducts = productsRes.data;
 
-            // Step C: The "Frontend JOIN" Hack
+            // The "Frontend JOIN" Hack
             const enrichedCartItems = await Promise.all(rawCartItems.map(async (cartItem) => {
                 let matchedProduct = null;
                 let matchedStock = null;
@@ -45,14 +45,14 @@ export const CartProvider = ({ children }) => {
                         if (foundStock) {
                             matchedStock = foundStock;
                             matchedProduct = product;
-                            break; // We found the shoe, stop hunting!
+                            break; // found the shoe, stop hunting!
                         }
                     } catch (e) {
                         console.error("Error fetching stock for product", product.id);
                     }
                 }
 
-                // Step D: Return the exact JSON structure that your Cart.jsx UI expects!
+                // Return the exact JSON structure that your Cart.jsx UI expects!
                 return {
                     ...cartItem,
                     stock: {
@@ -80,7 +80,7 @@ export const CartProvider = ({ children }) => {
         fetchCart();
     }, [user]);
 
-    // 2. POST /cart/{stock_id} - Add item to cart
+    // POST /cart/{stock_id} - Add item to cart
     const addToCart = async (stockId) => {
         try {
             await api.post(`/cart/${stockId}`);
@@ -91,7 +91,7 @@ export const CartProvider = ({ children }) => {
         }
     };
 
-    // 3. PATCH /cart/{cart_item_id} - Update quantity
+    // PATCH /cart/{cart_item_id} - Update quantity
     const updateQuantity = async (cartItemId, newQuantity) => {
         if (newQuantity < 1) return; // Prevent negative quantities
         try {
@@ -103,7 +103,7 @@ export const CartProvider = ({ children }) => {
         }
     };
 
-    // 4. DELETE /cart/{cart_item_id} - Remove item
+    // DELETE /cart/{cart_item_id} - Remove item
     const removeFromCart = async (cartItemId) => {
         try {
             await api.delete(`/cart/${cartItemId}`);

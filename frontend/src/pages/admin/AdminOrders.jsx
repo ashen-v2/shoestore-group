@@ -35,7 +35,6 @@ const AdminOrders = () => {
     const handleStatusChange = async (orderId, field, newValue) => {
         setUpdatingId(orderId);
         try {
-            // This perfectly matches the PATCH /admin/orders/{order_id} schema!
             const payload = { [field]: newValue };
             await api.patch(`/admin/orders/${orderId}`, payload);
 

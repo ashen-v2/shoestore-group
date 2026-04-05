@@ -15,7 +15,7 @@ const ModeratorDashboard = () => {
     const [newStock, setNewStock] = useState({ productId: '', size: '', quantity: '' });
 
     // ==========================================
-    // 1. HELP DESK LOGIC
+    //  HELP DESK LOGIC
     // ==========================================
     const fetchAllTickets = async () => {
         try {
@@ -54,16 +54,16 @@ const ModeratorDashboard = () => {
     };
 
     // ==========================================
-    // 2. INVENTORY LOGIC (UPDATED FOR NEW ENDPOINTS)
+    //  INVENTORY LOGIC
     // ==========================================
     const fetchInventory = async () => {
         setLoadingInventory(true);
         try {
-            // 1. Fetch all products
+            // Fetch all products
             const prodRes = await api.get('/products/');
             const productsData = prodRes.data;
 
-            // 2. Fetch stocks for EACH product using the specific GET endpoint
+            // Fetch stocks for EACH product using the specific GET endpoint
             const productsWithStocks = await Promise.all(
                 productsData.map(async (product) => {
                     try {
