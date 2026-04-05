@@ -33,4 +33,10 @@ npm run dev
 - Backend: Python 3.10+ (see `backend/requirements.txt`)
 - Frontend: Node 16+ (Vite + React)
 
+## Preview
+
+```md
+![Homepage screenshot](frontend/public/screenshots/homepage.jpg)
+```
+
 
