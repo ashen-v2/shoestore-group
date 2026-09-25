@@ -1,0 +1,54 @@
+# --- General System & IDE Files ---
+.git
+.gitignore
+.dockerignore
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# --- JavaScript / React Specifics ---
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-store/
+.npm/
+
+# Build outputs (React/JS)
+build/
+dist/
+out/
+.next/
+.cache/
+
+# --- Python Specifics ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environments (Python)
+.env
+.venv
+env/
+venv/
+ENV/
+
+# Testing and Coverage
+.pytest_cache/
+htmlcov/
+.coverage
+.coverage.*
+
+# Logs and Databases
+*.log
+*.sqlite3
+*.db
