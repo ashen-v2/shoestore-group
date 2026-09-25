@@ -7,12 +7,21 @@
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
       POSTGRES_DB: ${POSTGRES_DB:-postgres}
 
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+    volumes:
+      - shoestorevolume:/var/lib/postgresql
+
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    ports:
-      - 8000:8000
+
     
     environment:
        DATABASE_URL: ${DATABASE_URL:-postgresql://postgres:postgres@db:5432/postgres}
@@ -22,30 +31,31 @@
        STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-sk_test_4eC39HqLyjWDarjtT1zdp7dc}
        STRIPE_WEB_HOOK_SECRET: ${STRIPE_WEB_HOOK_SECRET:-whsec_test_webhook_secret}
        MAIL_API_KEY: ${MAIL_API_KEY:-test_mail_api_key}
-       ORIGINS: ${ORIGINS:-http://localhost:3000,http://localhost:8000}
+       ORIGINS: ${ORIGINS:-http://localhost:3000,http://localhost:5173,http://localhost,http://localhost:8080}
 
-    command:  /bin/sh -c "uvicorn main:app"
+    ports:
+      - 8000:8000
+
+    command:  /bin/sh -c "alembic upgrade head && uvicorn main:app --host 0.0.0.0 --port 8000"
 
     depends_on:
       - db
 
   frontend:
     build:
-      context: ./frontend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: nginx/Dockerfile
     
     ports:
-      - 3000:3000
-      - 5173:5173
+      - 80:80
     
     environment:
-       VITE_API_URL : ${VITE_API_URL:-/}
+       VITE_API_URL : ${VITE_API_URL:-http://localhost/api/}
        VITE_STRIPE_PUBLIC_KEY: ${VITE_STRIPE_PUBLIC_KEY:-pk_test_51N7g0pL1k6Z9}
-    
-    stdin_open: true   # equivalent to -i (interactive)
-    tty: true
-
-    command:  /bin/sh -c "npm run dev -- --host"
 
     depends_on:
       - backend
+
+ volumes:
+  shoestorevolume:
+ 
